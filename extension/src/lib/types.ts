@@ -1,4 +1,6 @@
-export type Platform = 'leetcode';
+// Recognized platforms get a stable literal from their adapter (e.g. 'leetcode'); everything
+// caught by GenericCodingAdapter is keyed by hostname instead, so this stays open-ended.
+export type Platform = string;
 
 export interface Problem {
   platform: Platform;

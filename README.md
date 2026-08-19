@@ -1,13 +1,13 @@
 # Noryx
 
 Your AI coding coach: a Safari Web Extension that watches you solve problems on coding platforms
-(LeetCode first) and coaches you — hints, questions, pattern recognition — without writing the
-solution for you. See the full product vision in the original PRD (not checked in here).
+and coaches you — hints, questions, pattern recognition — without writing the solution for you.
+See the full product vision in the original PRD (not checked in here).
 
 This repo currently implements the **First Milestone** only:
 
 ```
-Open a LeetCode problem
+Open a problem on a supported coding site
         ↓
 Extension detects the problem
         ↓
@@ -25,7 +25,25 @@ Dashboard (click the toolbar icon) shows:
 Problem, platform, active time, attempts, language, result
 ```
 
-No AI layer, no other platform adapters, and no roadmap/analytics yet — those are later phases.
+No AI layer and no roadmap/analytics yet — those are later phases.
+
+### Platform coverage
+
+Detection runs through a `UniversalDetector` (`extension/src/lib/adapters/universal-detector.ts`)
+that tries adapters in order and uses the first one that matches the page:
+
+- **`LeetCodeAdapter`** — precise, LeetCode-specific selectors.
+- **`GenericCodingAdapter`** — a cross-site fallback (code editor + Run/Submit button + verdict-text
+  scanning) that's what makes the other 8 sites work at all without a bespoke adapter for each:
+  Codeforces, CodeChef, HackerRank, AtCoder, GeeksforGeeks, HackerEarth, Kattis, CSES.
+
+The generic adapter's verdict matching is confident on ACM-style judges (Codeforces, AtCoder,
+Kattis, CSES — same "Wrong Answer"/"Time Limit Exceeded" vocabulary as LeetCode) and weaker on
+platforms with more custom result UIs (HackerRank, GeeksforGeeks, HackerEarth, CodeChef) — none of
+these were reachable to inspect live from this environment (LeetCode itself is behind a Cloudflare
+challenge that blocked both `curl` and automated fetching here). If one of those needs real
+precision, give it its own adapter — same shape as `leetcode.ts` — once you've inspected its actual
+DOM in a browser.
 
 ## Design
 
@@ -40,9 +58,16 @@ replaced with real tracked data.
 extension/
   manifest.json              Safari Web Extension manifest (MV3)
   src/
-    lib/                     Shared types, storage helpers, adapter interface
+    lib/
+      types.ts                Problem/Session/Submission types, storage.ts, messages.ts
+      adapters/
+        types.ts               CodingPlatformAdapter interface (per the PRD, verbatim)
+        dom-heuristics.ts       Shared leaf-text scanning + verdict watcher, used by both adapters
+        leetcode.ts             Precise LeetCode adapter
+        generic.ts              Cross-site fallback adapter (the other 8 platforms)
+        universal-detector.ts   Picks the first matching adapter for the current page
     background/               Persists events from the content script into storage
-    content-scripts/leetcode.ts   Detects problem/session/submission on leetcode.com
+    content-scripts/universal.ts   Runs whichever adapter matches, drives session/heartbeat/submission
     dashboard/                 React app, opened as an extension page from the toolbar icon
 ```
 
@@ -66,13 +91,16 @@ npm run typecheck
 3. Enable the extension there. If it's unsigned, also enable
    Safari → Settings → Advanced → "Show features for web developers", then
    Develop → "Allow Unsigned Extensions".
-4. Open a `leetcode.com/problems/...` page. A session should start automatically. Submit a
-   solution, then click the Noryx toolbar icon to see it show up in the dashboard.
+4. Open a problem page on any supported site (e.g. `leetcode.com/problems/...`). A session should
+   start automatically. Submit a solution, then click the Noryx toolbar icon to see it show up in
+   the dashboard.
 
 ## Known limitations (by design, for this milestone)
 
-- LeetCode only. Other adapters (Codeforces, CodeChef, ...) are a later phase.
-- Submission detection uses DOM text-matching heuristics (LeetCode exposes no stable
-  `data-testid` for this) — see the `ponytail:` comment in
-  `extension/src/lib/adapters/leetcode.ts` if it needs patching after a LeetCode redesign.
+- Submission/difficulty/language detection uses DOM heuristics, not verified platform APIs — see
+  the `ponytail:` comments in `extension/src/lib/adapters/leetcode.ts` and `generic.ts` for what's
+  precise vs. best-effort, and patch there if a site's markup changes underneath it.
 - Active/idle time is tracked via tab visibility + focus, not keystroke-level activity.
+- `GenericCodingAdapter`'s editor/action-button detection can in principle false-positive on a
+  non-coding page that happens to have a `<textarea>` and a button labeled "Submit" — narrow the
+  heuristic in `generic.ts` if that turns out to matter in practice.

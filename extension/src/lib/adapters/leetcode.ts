@@ -1,3 +1,4 @@
+import { findLeafByExactText, SubmissionWatcher } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -23,24 +24,10 @@ function slugFromUrl(): string | null {
   return match ? match[1] : null;
 }
 
-function findLeafByExactText(candidates: string[]): { text: string; el: Element } | null {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-  let node = walker.nextNode() as Element | null;
-  while (node) {
-    if (node.children.length === 0) {
-      const text = node.textContent?.trim() ?? '';
-      if (candidates.includes(text)) return { text, el: node };
-    }
-    node = walker.nextNode() as Element | null;
-  }
-  return null;
-}
-
 export class LeetCodeAdapter implements CodingPlatformAdapter {
-  private submissionQueue: SubmissionEvent[] = [];
-  private submissionWaiters: Array<(ev: SubmissionEvent | null) => void> = [];
-  private observer: MutationObserver | null = null;
-  private seenStatusNodes = new WeakSet<Element>();
+  private watcher = new SubmissionWatcher((text) =>
+    STATUS_STRINGS.includes(text as SubmissionStatus) ? (text as SubmissionStatus) : null,
+  );
 
   detect(): boolean {
     return location.hostname === 'leetcode.com' && slugFromUrl() !== null;
@@ -74,39 +61,6 @@ export class LeetCodeAdapter implements CodingPlatformAdapter {
   }
 
   detectSubmission(): Promise<SubmissionEvent | null> {
-    this.ensureObserver();
-    if (this.submissionQueue.length > 0) {
-      return Promise.resolve(this.submissionQueue.shift()!);
-    }
-    return new Promise((resolve) => this.submissionWaiters.push(resolve));
-  }
-
-  private ensureObserver(): void {
-    if (this.observer) return;
-    this.observer = new MutationObserver(() => this.scanForSubmissionResult());
-    this.observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-  }
-
-  private scanForSubmissionResult(): void {
-    const hit = findLeafByExactText(STATUS_STRINGS);
-    if (!hit || this.seenStatusNodes.has(hit.el)) return;
-    this.seenStatusNodes.add(hit.el);
-
-    const container = hit.el.closest('[class]')?.parentElement ?? hit.el.parentElement;
-    const nearbyText = container?.textContent ?? '';
-    const runtimeMatch = nearbyText.match(/(\d+(?:\.\d+)?\s?ms)/i);
-    const memoryMatch = nearbyText.match(/(\d+(?:\.\d+)?\s?MB)/i);
-
-    const event: SubmissionEvent = {
-      status: hit.text as SubmissionStatus,
-      language: 'Unknown',
-      runtime: runtimeMatch?.[1],
-      memory: memoryMatch?.[1],
-      timestamp: Date.now(),
-    };
-
-    const waiter = this.submissionWaiters.shift();
-    if (waiter) waiter(event);
-    else this.submissionQueue.push(event);
+    return this.watcher.next();
   }
 }

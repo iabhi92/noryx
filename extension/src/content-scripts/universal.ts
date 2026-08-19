@@ -1,6 +1,7 @@
-import { LeetCodeAdapter } from '../lib/adapters/leetcode';
+import { detectAdapter } from '../lib/adapters/universal-detector';
 import { problemKey } from '../lib/types';
 import type { RuntimeMessage } from '../lib/messages';
+import type { CodingPlatformAdapter } from '../lib/adapters/types';
 
 const HEARTBEAT_INTERVAL_MS = 15000;
 
@@ -34,7 +35,7 @@ function runHeartbeat(key: string): void {
   }, HEARTBEAT_INTERVAL_MS);
 }
 
-async function runSubmissionLoop(adapter: LeetCodeAdapter, key: string): Promise<void> {
+async function runSubmissionLoop(adapter: CodingPlatformAdapter, key: string): Promise<void> {
   const initialEditorState = await adapter.getEditorState();
   let lastKnownLanguage = initialEditorState?.language ?? 'Unknown';
 
@@ -52,8 +53,8 @@ async function runSubmissionLoop(adapter: LeetCodeAdapter, key: string): Promise
 }
 
 async function main(): Promise<void> {
-  const adapter = new LeetCodeAdapter();
-  if (!adapter.detect()) return;
+  const adapter = detectAdapter();
+  if (!adapter) return;
 
   const problem = await adapter.getProblem();
   if (!problem) return;

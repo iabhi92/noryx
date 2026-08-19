@@ -6,7 +6,7 @@
   "scripts": {
     "dev:dashboard": "vite",
     "build:bg": "esbuild src/background/index.ts --bundle --outfile=dist/background.js --format=iife --target=es2020",
-    "build:cs": "esbuild src/content-scripts/leetcode.ts --bundle --outfile=dist/content-scripts/leetcode.js --format=iife --target=es2020",
+    "build:cs": "esbuild src/content-scripts/universal.ts --bundle --outfile=dist/content-scripts/universal.js --format=iife --target=es2020",
     "build:dashboard": "vite build",
     "build:assets": "node scripts/copy-assets.mjs",
     "build": "npm run build:bg && npm run build:cs && npm run build:dashboard && npm run build:assets",

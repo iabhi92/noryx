@@ -21,11 +21,31 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/problems/*"],
-      "js": ["content-scripts/leetcode.js"],
+      "matches": [
+        "https://leetcode.com/problems/*",
+        "https://codeforces.com/*",
+        "https://www.codechef.com/*",
+        "https://www.hackerrank.com/*",
+        "https://atcoder.jp/*",
+        "https://www.geeksforgeeks.org/*",
+        "https://www.hackerearth.com/*",
+        "https://open.kattis.com/*",
+        "https://cses.fi/*"
+      ],
+      "js": ["content-scripts/universal.js"],
       "run_at": "document_idle"
     }
   ],
   "permissions": ["storage", "tabs"],
-  "host_permissions": ["https://leetcode.com/*"]
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://codeforces.com/*",
+    "https://www.codechef.com/*",
+    "https://www.hackerrank.com/*",
+    "https://atcoder.jp/*",
+    "https://www.geeksforgeeks.org/*",
+    "https://www.hackerearth.com/*",
+    "https://open.kattis.com/*",
+    "https://cses.fi/*"
+  ]
 }
