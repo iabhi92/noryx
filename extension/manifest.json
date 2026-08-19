@@ -36,7 +36,7 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["storage", "tabs"],
+  "permissions": ["storage", "tabs", "notifications"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://codeforces.com/*",
@@ -46,6 +46,7 @@
     "https://www.geeksforgeeks.org/*",
     "https://www.hackerearth.com/*",
     "https://open.kattis.com/*",
-    "https://cses.fi/*"
+    "https://cses.fi/*",
+    "https://generativelanguage.googleapis.com/*"
   ]
 }

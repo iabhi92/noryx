@@ -25,7 +25,32 @@ Dashboard (click the toolbar icon) shows:
 Problem, platform, active time, attempts, language, result
 ```
 
-No AI layer and no roadmap/analytics yet — those are later phases.
+No roadmap/analytics or personal-memory phases yet — those are later. The AI coaching layer
+(below) is now built.
+
+### AI coaching layer
+
+`extension/src/lib/ai/` — an `AIProvider` abstraction per the PRD (kept provider-agnostic; only the
+`generateHint` slice, called `HintProvider`, is actually implemented right now via
+`GeminiProvider`), a conservative event-based `shouldIntervene()` intervention engine (own
+self-check: `npm run check:intervention`, no API key needed), and 4 progressive hint levels
+(Socratic → Direction → Pattern → Concept), with a full solution only ever given on explicit
+request behind a warning.
+
+- Set a free Gemini API key ([aistudio.google.com/apikey](https://aistudio.google.com/apikey)) in
+  the dashboard's Coach panel to enable it — nothing AI-related runs without one.
+- Proactive nudges: after every heartbeat/submission, the background script checks
+  `shouldIntervene()` (stuck 10+ min with no attempts, 2+ repeated failures, 3+ total failures, a
+  5-minute cooldown between nudges) and fires a native `chrome.notifications` alert if it decides
+  to help — quiet by default, per the PRD's "prefer no intervention over an unnecessary
+  interruption."
+- Manual hints and the hint history live in the dashboard's Coach panel, not a new nav page (no
+  router exists yet — it's a section on the one dashboard view).
+- Deliberately not in this pass: the in-page floating "Noryx Coach" overlay (PRD §15) — the surface
+  today is the dashboard + notifications, not an overlay injected into the coding-platform page.
+  Also not sent to the model: your actual code (only problem metadata + submission-status history)
+  — levels 1-3 are about approach, not code review, so this holds up without it; code-aware hints
+  are a natural next step once `EditorState` gains a `code` field.
 
 ### Platform coverage
 
@@ -81,16 +106,22 @@ extension/
   manifest.json              Safari Web Extension manifest (MV3)
   src/
     lib/
-      types.ts                Problem/Session/Submission types, storage.ts, messages.ts
+      types.ts                Problem/Session/Submission/Hint types, storage.ts, messages.ts, settings.ts
       adapters/
         types.ts               CodingPlatformAdapter interface (per the PRD, verbatim)
         dom-heuristics.ts       Shared leaf-text scanning + verdict watcher, used by both adapters
         leetcode.ts             Precise LeetCode adapter
         generic.ts              Cross-site fallback adapter (the other 8 platforms)
         universal-detector.ts   Picks the first matching adapter for the current page
-    background/               Persists events from the content script into storage
+      ai/
+        types.ts                AIProvider (PRD-verbatim) + HintProvider (what's actually implemented)
+        gemini-provider.ts       GeminiProvider — REST calls to Gemini, per-level prompts
+        intervention.ts          shouldIntervene() — pure, self-checked via check:intervention
+    background/               Persists events from the content script into storage; runs
+                               shouldIntervene() after each heartbeat/submission, fires notifications
     content-scripts/universal.ts   Runs whichever adapter matches, drives session/heartbeat/submission
     dashboard/                 React app, opened as an extension page from the toolbar icon
+      components/CoachPanel.tsx   API key prompt, hint feed, "Ask for a hint" / "Show full solution"
 ```
 
 ## Build

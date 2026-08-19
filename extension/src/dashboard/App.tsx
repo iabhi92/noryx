@@ -4,6 +4,7 @@ import type { CodingSession, StoredSubmission } from '../lib/types';
 import Sidebar from './components/Sidebar';
 import StatTile from './components/StatTile';
 import ProblemsTable, { type ProblemRow } from './components/ProblemsTable';
+import CoachPanel from './components/CoachPanel';
 
 function formatDuration(ms: number): string {
   const totalMinutes = Math.round(ms / 60000);
@@ -85,6 +86,7 @@ export default function App() {
           </h1>
           <p className="font-body-md text-on-surface-variant">Your coding sessions, tracked automatically.</p>
         </div>
+        <CoachPanel />
         <div className="grid grid-cols-1 md:grid-cols-4 gap-sm mb-md">
           <StatTile label="Problems Solved" value={String(stats.solved)} />
           <StatTile label="Active Coding Time" value={formatDuration(stats.activeTime)} />

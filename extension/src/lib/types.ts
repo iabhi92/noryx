@@ -54,6 +54,19 @@ export interface CodingSession {
   idleMs: number;
   tabSwitches: number;
   attempts: number;
+  hintLevel: number; // 0 = no hint yet; 1-4 = PRD's progressive levels reached so far
+  lastHintAt?: number; // drives the intervention cooldown
+}
+
+export type HintLevel = 1 | 2 | 3 | 4;
+
+export interface StoredHint {
+  id: string;
+  sessionId: string;
+  level: HintLevel | 'solution';
+  text: string;
+  createdAt: number;
+  auto: boolean; // proactive intervention vs. user-clicked "Ask for a hint"
 }
 
 export function problemKey(platform: Platform, externalId: string): string {

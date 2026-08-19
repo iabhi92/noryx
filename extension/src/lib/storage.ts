@@ -1,9 +1,19 @@
-import type { StoredProblem, CodingSession, StoredSubmission, Problem, ProblemMetadata, SubmissionEvent } from './types';
+import type {
+  StoredProblem,
+  CodingSession,
+  StoredSubmission,
+  Problem,
+  ProblemMetadata,
+  SubmissionEvent,
+  StoredHint,
+  HintLevel,
+} from './types';
 
 const KEYS = {
   problems: 'noryx:problems',
   sessions: 'noryx:sessions',
   submissions: 'noryx:submissions',
+  hints: 'noryx:hints',
 } as const;
 
 async function getMap<T>(key: string): Promise<Record<string, T>> {
@@ -35,6 +45,7 @@ export async function getOrCreateSession(problemKey: string): Promise<CodingSess
     idleMs: 0,
     tabSwitches: 0,
     attempts: 0,
+    hintLevel: 0,
   };
   sessions[session.id] = session;
   await setMap(KEYS.sessions, sessions);
@@ -87,4 +98,34 @@ export async function getAllSessions(): Promise<Record<string, CodingSession>> {
 
 export async function getAllSubmissions(): Promise<Record<string, StoredSubmission[]>> {
   return getMap<StoredSubmission[]>(KEYS.submissions);
+}
+
+export async function getSubmissionsForSession(sessionId: string): Promise<StoredSubmission[]> {
+  const all = await getMap<StoredSubmission[]>(KEYS.submissions);
+  return all[sessionId] ?? [];
+}
+
+export async function addHint(hint: Omit<StoredHint, 'id'>): Promise<StoredHint> {
+  const hints = await getMap<StoredHint[]>(KEYS.hints);
+  const stored: StoredHint = { ...hint, id: `${hint.sessionId}:${hint.createdAt}` };
+  hints[hint.sessionId] = [...(hints[hint.sessionId] ?? []), stored];
+  await setMap(KEYS.hints, hints);
+  return stored;
+}
+
+export async function getHintsForSession(sessionId: string): Promise<StoredHint[]> {
+  const hints = await getMap<StoredHint[]>(KEYS.hints);
+  return hints[sessionId] ?? [];
+}
+
+export async function updateSessionHintState(
+  sessionId: string,
+  hintLevel: HintLevel,
+  lastHintAt: number,
+): Promise<void> {
+  const sessions = await getMap<CodingSession>(KEYS.sessions);
+  const current = sessions[sessionId];
+  if (!current) return;
+  sessions[sessionId] = { ...current, hintLevel, lastHintAt };
+  await setMap(KEYS.sessions, sessions);
 }
