@@ -10,7 +10,10 @@ export interface Problem {
 }
 
 export interface ProblemMetadata {
-  difficulty?: 'Easy' | 'Medium' | 'Hard';
+  // Plain string, not an Easy/Medium/Hard union: platforms don't agree on a scale
+  // (GeeksforGeeks has a "Basic" tier below Easy; Kattis rates numerically). Only ever
+  // set from text actually read off the page — never mapped/invented across scales.
+  difficulty?: string;
   topics?: string[];
 }
 

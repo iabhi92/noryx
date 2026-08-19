@@ -1,4 +1,4 @@
-import { findLeafByExactText, SubmissionWatcher } from './dom-heuristics';
+import { findLeafByExactText, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -24,7 +24,7 @@ function slugFromUrl(): string | null {
   return match ? match[1] : null;
 }
 
-export class LeetCodeAdapter implements CodingPlatformAdapter {
+export class LeetCodeAdapter implements CodingPlatformAdapter, Stoppable {
   private watcher = new SubmissionWatcher((text) =>
     STATUS_STRINGS.includes(text as SubmissionStatus) ? (text as SubmissionStatus) : null,
   );
@@ -49,7 +49,7 @@ export class LeetCodeAdapter implements CodingPlatformAdapter {
   async getProblemMetadata(): Promise<ProblemMetadata | null> {
     const difficulty = findLeafByExactText(['Easy', 'Medium', 'Hard']);
     return {
-      difficulty: (difficulty?.text as ProblemMetadata['difficulty']) ?? undefined,
+      difficulty: difficulty?.text,
       // Topics aren't reliably exposed pre-solve; the PRD forbids inventing data, so this stays empty.
       topics: undefined,
     };
@@ -62,5 +62,9 @@ export class LeetCodeAdapter implements CodingPlatformAdapter {
 
   detectSubmission(): Promise<SubmissionEvent | null> {
     return this.watcher.next();
+  }
+
+  stop(): void {
+    this.watcher.stop();
   }
 }

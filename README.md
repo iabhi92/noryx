@@ -37,13 +37,34 @@ that tries adapters in order and uses the first one that matches the page:
   scanning) that's what makes the other 8 sites work at all without a bespoke adapter for each:
   Codeforces, CodeChef, HackerRank, AtCoder, GeeksforGeeks, HackerEarth, Kattis, CSES.
 
-The generic adapter's verdict matching is confident on ACM-style judges (Codeforces, AtCoder,
-Kattis, CSES — same "Wrong Answer"/"Time Limit Exceeded" vocabulary as LeetCode) and weaker on
-platforms with more custom result UIs (HackerRank, GeeksforGeeks, HackerEarth, CodeChef) — none of
-these were reachable to inspect live from this environment (LeetCode itself is behind a Cloudflare
-challenge that blocked both `curl` and automated fetching here). If one of those needs real
-precision, give it its own adapter — same shape as `leetcode.ts` — once you've inspected its actual
-DOM in a browser.
+### Verified per-platform status
+
+Fetched each site's real (logged-out) HTML from this environment to check what's actually there,
+rather than guess. Findings, honestly:
+
+| Platform | Reachable? | Editor on the problem page? | Notes |
+|---|---|---|---|
+| LeetCode | No — Cloudflare challenge blocked `curl`/fetch | — | Has its own adapter; hardening it needs DOM pasted from a live session (in progress). |
+| Codeforces | No — Cloudflare challenge | — | Falls through to the generic adapter, unverified. |
+| **HackerRank** | Yes | **Confirmed** — `.monaco-editor` present | Difficulty confirmed as isolated leaf text ("Easy" inside a `.difficulty-easy` badge) — the generic adapter's heuristics should work here as built. |
+| AtCoder | Yes | Not on the problem/task page — the submit form lives on a separate URL (classic multi-page site, not a SPA) | Should work once the user is actually on the submit page (manifest matches the whole domain); untested. |
+| CodeChef | Yes | Not found in the static HTML | Editor likely loads via a separate mechanism not visible logged-out. Unverified. |
+| Kattis | Yes | None on the anonymous problem page — no editor, no file-upload form | Difficulty extraction confirmed to work (isolated "Easy" text), but submission itself is probably behind login. Won't be detected as-is. |
+| CSES | Yes | None found logged-out | Same story as Kattis — likely needs an authenticated session to see the real submission UI. |
+| GeeksforGeeks | Yes | Not found in the static HTML (likely client-rendered after hydration) | Difficulty exists as embedded JSON (`"difficulty":"Basic"` — GFG has a 4th tier below Easy, now supported by widening `ProblemMetadata.difficulty` to a plain string) but isn't confirmed as visible leaf text. |
+| HackerEarth | Not probed | — | No confidently-known problem URL to test against. |
+
+Net: the generic adapter's shape (in-page editor + Run/Submit control) matches how LeetCode and
+HackerRank actually work. Several others don't fit that shape at all when logged out — that's a
+real gap, not a guess dressed up as one. Closing it needs real DOM from a logged-in session on each
+platform, the same way LeetCode's adapter is being hardened — paste snippets and I'll turn them
+into precise selectors or a platform-specific adapter.
+
+One SPA-navigation bug this investigation did surface and fix: several of these are React
+frontends that can switch problems via client-side routing (no full page reload), which would have
+left the content script's detection stale. `content-scripts/universal.ts` now watches for URL
+changes (patches `history.pushState`, listens for `popstate`, polls as a fallback) and re-runs
+detection on every navigation, tearing down the previous adapter's observer first.
 
 ## Design
 

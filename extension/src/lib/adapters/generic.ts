@@ -1,15 +1,20 @@
-import { findLeafByExactText, SubmissionWatcher } from './dom-heuristics';
+import { findLeafByExactText, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
 // ponytail: cross-site heuristics, not per-platform scraping — this is what makes "works on a
-// variety of coding sites" tractable without a bespoke adapter per judge. It's reasonably
-// reliable on ACM-style judges (Codeforces/AtCoder/Kattis/CSES/LeetCode-like verdict vocabulary,
-// e.g. "Wrong Answer" / "Time Limit Exceeded"). It's weaker on platforms with custom result UIs
-// (HackerRank, GeeksforGeeks, HackerEarth, CodeChef) whose exact wording wasn't verified against
-// a live page — none of these sites were reachable to inspect from this environment (Cloudflare
-// challenge). If one of those needs real precision, give it its own adapter, same shape as
-// leetcode.ts, once you've inspected its actual DOM.
+// variety of coding sites" tractable without a bespoke adapter per judge.
+//
+// Verified against real (logged-out) HTML fetched from each site — see extension/README.md for
+// the honest per-platform status. Short version: works where the problem page itself has an
+// in-browser editor + Run/Submit control (confirmed on HackerRank). Several major platforms don't
+// fit that shape at all when logged out — AtCoder's submit form lives on a separate URL from the
+// problem statement, CodeChef's editor isn't in the static page, and Kattis/CSES show no
+// in-page submission UI without an authenticated session — so this adapter simply won't detect a
+// session on those pages as they render logged-out. LeetCode and Codeforces couldn't be inspected
+// at all (Cloudflare challenge blocked fetching from this environment). None of that is guessable
+// from here — it needs real DOM pasted from a logged-in session, the same way LeetCode's adapter
+// is being hardened.
 
 const EDITOR_SELECTORS = ['.monaco-editor', '.CodeMirror', '.cm-editor', '.ace_editor', 'textarea'];
 const ACTION_BUTTON_TEXTS = ['run', 'submit', 'compile', 'execute', 'run code', 'submit code'];
@@ -47,7 +52,7 @@ function hasActionButton(): boolean {
   return false;
 }
 
-export class GenericCodingAdapter implements CodingPlatformAdapter {
+export class GenericCodingAdapter implements CodingPlatformAdapter, Stoppable {
   private watcher = new SubmissionWatcher(matchStatus);
 
   detect(): boolean {
@@ -68,9 +73,11 @@ export class GenericCodingAdapter implements CodingPlatformAdapter {
   }
 
   async getProblemMetadata(): Promise<ProblemMetadata | null> {
-    const difficulty = findLeafByExactText(['Easy', 'Medium', 'Hard']);
+    // 'Basic' confirmed as GeeksforGeeks's tier below Easy (seen in its embedded problem JSON);
+    // included here in case it's also rendered as a standalone badge, same as Easy/Medium/Hard.
+    const difficulty = findLeafByExactText(['Basic', 'Easy', 'Medium', 'Hard']);
     return {
-      difficulty: (difficulty?.text as ProblemMetadata['difficulty']) ?? undefined,
+      difficulty: difficulty?.text,
       topics: undefined,
     };
   }
@@ -85,5 +92,9 @@ export class GenericCodingAdapter implements CodingPlatformAdapter {
 
   detectSubmission(): Promise<SubmissionEvent | null> {
     return this.watcher.next();
+  }
+
+  stop(): void {
+    this.watcher.stop();
   }
 }

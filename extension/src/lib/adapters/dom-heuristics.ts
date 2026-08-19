@@ -19,8 +19,14 @@ export function findLeafByExactText(candidates: string[]): { text: string; el: E
 
 export type StatusMatcher = (text: string) => SubmissionStatus | null;
 
+/** Implemented by adapters that hold a live MutationObserver, so the content script can tear it
+ *  down on SPA navigation instead of leaking an observer that keeps watching the wrong problem. */
+export interface Stoppable {
+  stop(): void;
+}
+
 /** Watches the DOM for a verdict string and resolves the next `detectSubmission()` call with it. */
-export class SubmissionWatcher {
+export class SubmissionWatcher implements Stoppable {
   private queue: SubmissionEvent[] = [];
   private waiters: Array<(ev: SubmissionEvent | null) => void> = [];
   private observer: MutationObserver | null = null;
@@ -62,5 +68,14 @@ export class SubmissionWatcher {
     const waiter = this.waiters.shift();
     if (waiter) waiter(event);
     else this.queue.push(event);
+  }
+
+  /** Disconnects the observer and unblocks any pending `next()` call with null, so a caller
+   *  awaiting in a loop can see it and exit instead of hanging on a page that navigated away. */
+  stop(): void {
+    this.observer?.disconnect();
+    this.observer = null;
+    const pending = this.waiters.splice(0);
+    pending.forEach((resolve) => resolve(null));
   }
 }
