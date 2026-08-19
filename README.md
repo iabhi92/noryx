@@ -44,8 +44,8 @@ rather than guess. Findings, honestly:
 
 | Platform | Reachable? | Editor on the problem page? | Notes |
 |---|---|---|---|
-| LeetCode | No — Cloudflare challenge blocked `curl`/fetch | — | Has its own adapter; hardening it needs DOM pasted from a live session (in progress). |
-| Codeforces | No — Cloudflare challenge | — | Falls through to the generic adapter, unverified. |
+| **LeetCode** | `curl`/`WebFetch` blocked by Cloudflare — but a real, AppleScript-driven Safari session passes the same challenge normal browsing does | **Confirmed** — `.monaco-editor` present | Hardened against the live DOM: difficulty via `[class*="text-difficulty-"]`, Run/Submit buttons and the verdict panel via LeetCode's own `data-e2e-locator` test-ids (`console-run-button` / `console-submit-button` / `console-result`), runtime via a confirmed `Runtime: N ms` sibling text. This also caught a real bug — Run and Submit render into the *same* result element, so without tracking which button was clicked, every debug Run during iteration would've been miscounted as a submission attempt; fixed via click-tracking in `LeetCodeSubmissionWatcher`. |
+| Codeforces | No — Cloudflare challenge (didn't retry with real Safari here; same technique should work) | — | Falls through to the generic adapter, unverified. |
 | **HackerRank** | Yes | **Confirmed** — `.monaco-editor` present | Difficulty confirmed as isolated leaf text ("Easy" inside a `.difficulty-easy` badge) — the generic adapter's heuristics should work here as built. |
 | AtCoder | Yes | Not on the problem/task page — the submit form lives on a separate URL (classic multi-page site, not a SPA) | Should work once the user is actually on the submit page (manifest matches the whole domain); untested. |
 | CodeChef | Yes | Not found in the static HTML | Editor likely loads via a separate mechanism not visible logged-out. Unverified. |
@@ -57,8 +57,9 @@ rather than guess. Findings, honestly:
 Net: the generic adapter's shape (in-page editor + Run/Submit control) matches how LeetCode and
 HackerRank actually work. Several others don't fit that shape at all when logged out — that's a
 real gap, not a guess dressed up as one. Closing it needs real DOM from a logged-in session on each
-platform, the same way LeetCode's adapter is being hardened — paste snippets and I'll turn them
-into precise selectors or a platform-specific adapter.
+platform — the same technique that hardened LeetCode (driving a real, already-authenticated Safari
+session) should work for the Cloudflare-blocked ones too; the rest just need a look at their
+authenticated submission flow specifically, since that's the part that doesn't show up logged out.
 
 One SPA-navigation bug this investigation did surface and fix: several of these are React
 frontends that can switch problems via client-side routing (no full page reload), which would have
