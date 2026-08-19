@@ -1,9 +1,10 @@
 import type { HintProvider, HintContext, Hint } from './types';
 import { AIProviderError } from './types';
 
-// Gemini Flash-Lite class model per the PRD's "free-tier access" requirement. Bump this if a
-// newer Flash-Lite model id has since replaced it — not re-verified beyond this constant.
-const MODEL = 'gemini-2.0-flash-lite';
+// Gemini Flash-Lite class model per the PRD's "free-tier access" requirement. Verified live
+// against the real API (2026-08-20) — gemini-2.0-flash-lite has since been retired; Google's own
+// 404 response pointed to this replacement. Bump again if it's retired in turn.
+const MODEL = 'gemini-3.5-flash-lite';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
