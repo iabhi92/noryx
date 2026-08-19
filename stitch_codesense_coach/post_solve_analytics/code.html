@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyntaxCoach - Post-Solve Analysis</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#30353a",
+                        "secondary": "#d0bcff",
+                        "on-tertiary": "#233143",
+                        "electric-blue": "#0ea5e9",
+                        "soft-violet": "#a78bfa",
+                        "inverse-on-surface": "#2c3135",
+                        "on-background": "#dee3e9",
+                        "surface-bright": "#353a3e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#b9c8de",
+                        "on-primary-fixed": "#001e2f",
+                        "surface-tint": "#89ceff",
+                        "surface-container": "#1b2024",
+                        "surface-elevated": "#0d1e33",
+                        "surface-dim": "#0f1418",
+                        "on-surface-variant": "#bec8d2",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#89ceff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "surface-container-high": "#252b2f",
+                        "on-error": "#690005",
+                        "on-secondary": "#3c0091",
+                        "on-primary-container": "#003751",
+                        "glow-blue": "rgba(14, 165, 233, 0.15)",
+                        "on-tertiary-fixed-variant": "#3a485a",
+                        "primary": "#89ceff",
+                        "secondary-fixed": "#e9ddff",
+                        "tertiary-fixed-dim": "#b9c8de",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "surface-container-lowest": "#0a0f13",
+                        "on-primary": "#00344d",
+                        "surface-container-low": "#171c20",
+                        "primary-fixed": "#c9e6ff",
+                        "sapphire-deep": "#051424",
+                        "tertiary-container": "#8e9db2",
+                        "on-secondary-container": "#c4abff",
+                        "primary-container": "#0ea5e9",
+                        "background": "#0f1418",
+                        "surface": "#0f1418",
+                        "outline": "#88929b",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-surface": "#dee3e9",
+                        "on-tertiary-fixed": "#0e1c2d",
+                        "on-tertiary-container": "#263446",
+                        "surface-variant": "#30353a",
+                        "tertiary-fixed": "#d5e4fa",
+                        "on-secondary-fixed": "#23005c",
+                        "error-container": "#93000a",
+                        "secondary-container": "#571bc1",
+                        "inverse-surface": "#dee3e9",
+                        "outline-variant": "#3e4850",
+                        "inverse-primary": "#006591"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "2rem",
+                        "xs": "0.5rem",
+                        "sm": "1rem",
+                        "gutter": "2rem",
+                        "xl": "8rem",
+                        "lg": "4rem",
+                        "margin": "2.5rem",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "code-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.08em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "code-md": ["14px", { "lineHeight": "1.7", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #051424; color: #dee3e9; } /* sapphire-deep base */
+        
+        /* Utility for Material Symbols specific fills if needed by JSON */
+        .material-symbols-outlined[style*="'FILL' 1"] { font-variation-settings: 'FILL' 1; }
+
+        /* Custom scrollbar for code blocks */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3e4850; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #88929b; }
+    </style>
+</head>
+<body class="flex min-h-screen antialiased bg-sapphire-deep font-body-md text-body-md text-on-surface">
+<!-- SideNavBar (from JSON) -->
+<nav class="h-screen w-64 fixed left-0 top-0 border-r border-white/5 shadow-2xl bg-surface-container-lowest flex flex-col py-margin px-xs z-50">
+<!-- Header -->
+<div class="flex items-center gap-3 px-3 mb-10">
+<div class="w-10 h-10 rounded-lg bg-surface-elevated border border-white/10 flex items-center justify-center text-electric-blue shadow-[0_0_15px_rgba(14,165,233,0.1)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h1 class="font-display text-headline-md font-bold text-electric-blue tracking-tight leading-none">SyntaxCoach</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1 opacity-70">AI Assistant v2.4</p>
+</div>
+</div>
+<!-- Main Tabs -->
+<ul class="flex flex-col gap-2 flex-grow">
+<!-- Dashboard (Inactive) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-soft-violet transition-colors">dashboard</span>
+<span class="font-body-md text-body-md group-hover:translate-x-1 transition-transform">Dashboard</span>
+</a>
+</li>
+<!-- Roadmap (Inactive) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-soft-violet transition-colors">map</span>
+<span class="font-body-md text-body-md group-hover:translate-x-1 transition-transform">Roadmap</span>
+</a>
+</li>
+<!-- Sessions (Active - based on Post-Solve Context) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-electric-blue font-bold border-r-2 border-electric-blue bg-glow-blue shadow-[inset_0_0_20px_rgba(14,165,233,0.05)]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">code_blocks</span>
+<span class="font-body-md text-body-md">Sessions</span>
+</a>
+</li>
+<!-- Analytics (Inactive) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-soft-violet transition-colors">insights</span>
+<span class="font-body-md text-body-md group-hover:translate-x-1 transition-transform">Analytics</span>
+</a>
+</li>
+<!-- Settings (Inactive) -->
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 group" href="#">
+<span class="material-symbols-outlined group-hover:text-soft-violet transition-colors">settings</span>
+<span class="font-body-md text-body-md group-hover:translate-x-1 transition-transform">Settings</span>
+</a>
+</li>
+</ul>
+<!-- Footer Actions -->
+<div class="mt-auto flex flex-col gap-4">
+<!-- CTA -->
+<button class="w-full py-3 rounded-lg bg-gradient-to-br from-electric-blue to-soft-violet text-on-primary font-label-sm text-label-sm font-bold tracking-widest uppercase hover:shadow-[0_0_20px_rgba(14,165,233,0.4)] transition-shadow duration-300 active:scale-95">
+                New Session
+            </button>
+<ul class="flex flex-col gap-1 border-t border-white/5 pt-4">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">menu_book</span>
+<span>Docs</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 text-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">contact_support</span>
+<span>Help</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Workspace Area -->
+<div class="ml-64 w-[calc(100%-16rem)] min-h-screen flex flex-col relative overflow-hidden">
+<!-- Background Ambient Glows -->
+<div class="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-electric-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-soft-violet/10 rounded-full blur-[150px] pointer-events-none"></div>
+<!-- TopNavBar (from JSON) -->
+<header class="w-full h-16 sticky top-0 flex justify-between items-center px-gutter z-40 border-b border-white/10 shadow-[0_0_15px_rgba(14,165,233,0.1)] bg-sapphire-deep/70 backdrop-blur-xl">
+<!-- Search Bar (on_left) -->
+<div class="flex-1 max-w-md relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-electric-blue transition-colors">search</span>
+<input class="w-full bg-surface-container-high/50 border border-white/5 rounded-full py-2 pl-10 pr-4 font-body-md text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-electric-blue focus:border-electric-blue focus:bg-surface-elevated transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)]" placeholder="Search sessions, algorithms..." type="text"/>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-electric-blue hover:bg-white/5 transition-colors active:scale-95 duration-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-soft-violet rounded-full shadow-[0_0_8px_rgba(167,139,250,0.8)]"></span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-electric-blue hover:bg-white/5 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<div class="h-6 w-[1px] bg-white/10 mx-2"></div>
+<button class="px-4 py-1.5 rounded-full border border-electric-blue/30 text-electric-blue font-label-sm text-label-sm uppercase hover:bg-glow-blue hover:border-electric-blue transition-all active:scale-95 duration-200 shadow-[0_0_10px_rgba(14,165,233,0.1)]">
+                    Upgrade
+                </button>
+<img alt="User profile" class="w-9 h-9 rounded-full object-cover border border-white/10 ml-2 hover:border-electric-blue transition-colors cursor-pointer" data-alt="A futuristic, high-contrast avatar portrait of an engineer bathed in cool neon blue and soft violet lighting, modern tech vibe, highly detailed." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGDvD137hh8NvxsC9W2iLgz3PzVHMEVTxS1xX-VouCvo3POyqsM_s6cAsoXIyJ_jMfKI_YJ2sZNKLfpmUmJjGIK-NoWHeBJofEO3KuIMgxK5jSDMCOTO2cecj6jhEBCE3mZwsLAl3q06-BIg87IxifPbz9oXj4u2v9Qg3d_7zXIzYBisB7fNtBKrrwiZw0GdOcVs7i1czWGwXQ7kB6bk1H-2XfZRLKbOrG9zqam5XOy1vc2hkMBajpLg"/>
+</div>
+</header>
+<!-- Content Canvas -->
+<main class="flex-1 p-6 lg:p-8 xl:px-12 grid grid-cols-12 gap-6 relative z-10">
+<!-- Breadcrumb / Pre-header -->
+<div class="col-span-12 flex items-center gap-2 text-sm text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+<span>Sessions</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-electric-blue">Merge Sort Optimization</span>
+</div>
+<!-- Header Section & Scatter Plot (Span 12) -->
+<div class="col-span-12 grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Success Status -->
+<div class="lg:col-span-5 bg-surface-elevated/40 backdrop-blur-md rounded-xl border border-white/5 p-8 flex flex-col justify-center relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-glow-blue to-transparent opacity-20"></div>
+<div class="relative z-10 flex flex-col gap-4">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-high border border-white/10 flex items-center justify-center shadow-[0_0_20px_rgba(167,139,250,0.15)] mb-2">
+<span class="text-4xl">✅</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Algorithm Solved</h2>
+<div class="flex items-center gap-3">
+<span class="font-label-sm text-label-sm px-3 py-1 rounded-md bg-electric-blue/10 text-electric-blue border border-electric-blue/20">Optimal Performance</span>
+<span class="font-code-md text-code-md text-soft-violet bg-soft-violet/5 px-2 py-0.5 rounded">O(n log n)</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-sm">Your solution beats 94% of submissions in time complexity. Let's review the fine details.</p>
+</div>
+</div>
+<!-- Scatter Plot Widget (Execution Time vs Memory) -->
+<div class="lg:col-span-7 bg-surface-elevated/40 backdrop-blur-md rounded-xl border border-white/5 p-6 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-md text-headline-md text-on-surface text-lg">Performance Matrix</h3>
+<div class="flex gap-4">
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-electric-blue shadow-[0_0_5px_#0ea5e9]"></div><span class="font-label-sm text-xs text-on-surface-variant">Your Run</span></div>
+<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-surface-variant border border-white/20"></div><span class="font-label-sm text-xs text-on-surface-variant">Community Avg</span></div>
+</div>
+</div>
+<!-- Simulated Plot Area -->
+<div class="flex-1 relative w-full border-l border-b border-white/10 mt-2 ml-6 mb-6">
+<!-- Y-axis Label -->
+<div class="absolute -left-10 top-1/2 -translate-y-1/2 -rotate-90 font-label-sm text-[10px] text-on-surface-variant whitespace-nowrap tracking-widest">MEMORY (MB)</div>
+<!-- X-axis Label -->
+<div class="absolute -bottom-8 left-1/2 -translate-x-1/2 font-label-sm text-[10px] text-on-surface-variant tracking-widest">EXECUTION TIME (MS)</div>
+<!-- Grid lines -->
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20%_20%]"></div>
+<!-- Optimal Zone Highlight -->
+<div class="absolute bottom-0 left-0 w-1/3 h-1/3 bg-electric-blue/5 border-t border-r border-electric-blue/20 rounded-tr-lg"></div>
+<!-- Data Points -->
+<!-- Average cluster -->
+<div class="absolute bottom-[40%] left-[60%] w-2 h-2 rounded-full bg-surface-variant border border-white/20"></div>
+<div class="absolute bottom-[45%] left-[55%] w-2 h-2 rounded-full bg-surface-variant border border-white/20"></div>
+<div class="absolute bottom-[35%] left-[65%] w-2 h-2 rounded-full bg-surface-variant border border-white/20"></div>
+<!-- User's Run (Excellent performance: low time, low mem) -->
+<div class="absolute bottom-[20%] left-[15%] group">
+<div class="w-3 h-3 rounded-full bg-electric-blue shadow-[0_0_15px_#0ea5e9,inset_0_0_5px_#fff] relative z-10 cursor-pointer animate-pulse"></div>
+<!-- Tooltip -->
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block w-max bg-surface-container-high border border-white/10 px-3 py-2 rounded-md shadow-lg z-20">
+<p class="font-code-md text-xs text-electric-blue">Time: 42ms</p>
+<p class="font-code-md text-xs text-soft-violet">Mem: 18.4MB</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Middle Section: Code Review & Skill Growth -->
+<div class="col-span-12 grid grid-cols-1 xl:grid-cols-12 gap-6">
+<!-- Code Logic Review (Span 8) -->
+<div class="xl:col-span-8 bg-surface-elevated/40 backdrop-blur-md rounded-xl border border-white/5 flex flex-col overflow-hidden">
+<div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-surface-container-low/50">
+<div class="flex items-center gap-3">
+<span class="text-xl">🤖</span>
+<h3 class="font-headline-md text-base text-on-surface">Code Logic Review</h3>
+</div>
+<span class="font-label-sm text-xs px-2 py-1 rounded bg-white/5 text-on-surface-variant border border-white/10">solution.py</span>
+</div>
+<div class="flex-1 p-6 relative font-code-md text-code-md text-on-surface-variant leading-relaxed overflow-x-auto">
+<div class="flex">
+<!-- Line Numbers -->
+<div class="flex flex-col text-right pr-4 opacity-30 select-none border-r border-white/5 mr-4">
+<span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span class="text-soft-violet opacity-100 font-bold">7</span><span>8</span><span>9</span><span>10</span>
+</div>
+<!-- Code block -->
+<div class="flex flex-col w-full min-w-[500px]">
+<pre class="m-0"><span class="text-soft-violet">def</span> <span class="text-electric-blue">merge_sort</span>(arr):</pre>
+<pre class="m-0">    <span class="text-soft-violet">if</span> len(arr) &lt;= <span class="text-[#89ceff]">1</span>:</pre>
+<pre class="m-0">        <span class="text-soft-violet">return</span> arr</pre>
+<pre class="m-0">    mid = len(arr) // <span class="text-[#89ceff]">2</span></pre>
+<pre class="m-0">    left = merge_sort(arr[:mid])</pre>
+<pre class="m-0">    right = merge_sort(arr[mid:])</pre>
+<!-- Highlighted Line -->
+<div class="relative bg-soft-violet/10 border-l-2 border-soft-violet -ml-[calc(1rem+1px)] pl-[calc(1rem+1px)] py-1 flex items-center group">
+<pre class="m-0 text-on-surface">    <span class="text-soft-violet">return</span> merge(left, right)</pre>
+<!-- AI Popover pointing to this line -->
+<div class="absolute left-full ml-4 top-1/2 -translate-y-1/2 w-64 bg-surface-container-high border border-soft-violet/30 rounded-lg p-3 shadow-[0_5px_20px_rgba(0,0,0,0.3)] z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none before:content-[''] before:absolute before:right-full before:top-1/2 before:-translate-y-1/2 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-surface-container-high">
+<div class="flex gap-2 items-start">
+<span class="text-base mt-0.5">⚠️</span>
+<div>
+<p class="font-label-sm text-[10px] text-soft-violet uppercase tracking-wider mb-1">AI Insight</p>
+<p class="font-body-md text-xs text-on-surface leading-snug">The <code>merge</code> helper is clean, but ensure it avoids unnecessary list allocations to maintain true O(n) space complexity during the merge step.</p>
+</div>
+</div>
+</div>
+</div>
+<pre class="m-0"></pre>
+<pre class="m-0"><span class="text-soft-violet">def</span> <span class="text-electric-blue">merge</span>(left, right):</pre>
+<pre class="m-0">    result = []</pre>
+</div>
+</div>
+</div>
+</div>
+<!-- Skill Growth Card (Span 4) -->
+<div class="xl:col-span-4 bg-surface-elevated/40 backdrop-blur-md rounded-xl border border-white/5 p-6 flex flex-col">
+<div class="flex items-center gap-2 mb-6">
+<span class="text-xl">🚀</span>
+<h3 class="font-headline-md text-base text-on-surface">Skill Growth</h3>
+</div>
+<div class="flex flex-col gap-6 flex-1 justify-center">
+<!-- Skill 1 -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-sm text-on-surface uppercase tracking-wider">Recursion</span>
+<span class="font-code-md text-xs text-electric-blue bg-electric-blue/10 px-2 py-0.5 rounded border border-electric-blue/20">+50 XP</span>
+</div>
+<div class="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+<div class="h-full bg-gradient-to-r from-electric-blue to-soft-violet w-[75%] rounded-full shadow-[0_0_10px_rgba(14,165,233,0.5)] relative">
+<div class="absolute right-0 top-0 bottom-0 w-4 bg-white/30 blur-[2px]"></div>
+</div>
+</div>
+<div class="flex justify-between mt-1 opacity-50 font-code-md text-[10px]">
+<span>Lvl 12</span><span>Lvl 13</span>
+</div>
+</div>
+<!-- Skill 2 -->
+<div>
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-sm text-sm text-on-surface uppercase tracking-wider">Arrays</span>
+<span class="font-code-md text-xs text-soft-violet bg-soft-violet/10 px-2 py-0.5 rounded border border-soft-violet/20">+20 XP</span>
+</div>
+<div class="w-full h-2 bg-white/5 rounded-full overflow-hidden border border-white/5">
+<div class="h-full bg-gradient-to-r from-soft-violet to-secondary-container w-[40%] rounded-full shadow-[0_0_10px_rgba(167,139,250,0.5)] relative">
+<div class="absolute right-0 top-0 bottom-0 w-4 bg-white/30 blur-[2px]"></div>
+</div>
+</div>
+<div class="flex justify-between mt-1 opacity-50 font-code-md text-[10px]">
+<span>Lvl 8</span><span>Lvl 9</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Reflection Input -->
+<div class="col-span-12 mt-2">
+<div class="bg-surface-elevated/40 backdrop-blur-md rounded-xl border border-white/5 p-6">
+<label class="flex items-center gap-2 font-headline-md text-base text-on-surface mb-3" for="reflection">
+<span class="material-symbols-outlined text-electric-blue text-[20px]">edit_note</span>
+                        Session Reflection
+                    </label>
+<div class="relative group">
+<textarea class="w-full bg-sapphire-deep border border-soft-violet/30 rounded-lg p-4 font-body-md text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-electric-blue transition-all resize-none shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]" id="reflection" placeholder="What did you learn from this problem? e.g., 'Remembering the base case in recursion is crucial...'" rows="3"></textarea>
+<!-- Focus glow effect behind textarea -->
+<div class="absolute inset-0 rounded-lg bg-electric-blue/0 group-focus-within:bg-electric-blue/5 blur-md -z-10 transition-all duration-300"></div>
+</div>
+<div class="flex justify-end mt-4">
+<button class="px-6 py-2 rounded-lg bg-white/5 border border-white/10 text-on-surface font-label-sm text-sm uppercase tracking-wider hover:bg-white/10 hover:border-white/20 transition-all active:scale-95 duration-200">
+                            Save Note
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

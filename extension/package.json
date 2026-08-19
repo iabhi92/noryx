@@ -1,0 +1,32 @@
+{
+  "name": "noryx-extension",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev:dashboard": "vite",
+    "build:bg": "esbuild src/background/index.ts --bundle --outfile=dist/background.js --format=iife --target=es2020",
+    "build:cs": "esbuild src/content-scripts/leetcode.ts --bundle --outfile=dist/content-scripts/leetcode.js --format=iife --target=es2020",
+    "build:dashboard": "vite build",
+    "build:assets": "node scripts/copy-assets.mjs",
+    "build": "npm run build:bg && npm run build:cs && npm run build:dashboard && npm run build:assets",
+    "typecheck": "tsc --noEmit",
+    "icons": "python3 scripts/generate-icons.py"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.280",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.4.20",
+    "esbuild": "^0.24.0",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
+  }
+}

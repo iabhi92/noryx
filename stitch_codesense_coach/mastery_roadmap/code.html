@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SyntaxCoach - Mastery Roadmap</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-highest": "#30353a",
+                        "secondary": "#d0bcff",
+                        "on-tertiary": "#233143",
+                        "electric-blue": "#0ea5e9",
+                        "soft-violet": "#a78bfa",
+                        "inverse-on-surface": "#2c3135",
+                        "on-background": "#dee3e9",
+                        "surface-bright": "#353a3e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#b9c8de",
+                        "on-primary-fixed": "#001e2f",
+                        "surface-tint": "#89ceff",
+                        "surface-container": "#1b2024",
+                        "surface-elevated": "#0d1e33",
+                        "surface-dim": "#0f1418",
+                        "on-surface-variant": "#bec8d2",
+                        "error": "#ffb4ab",
+                        "primary-fixed-dim": "#89ceff",
+                        "on-secondary-fixed-variant": "#5516be",
+                        "surface-container-high": "#252b2f",
+                        "on-error": "#690005",
+                        "on-secondary": "#3c0091",
+                        "on-primary-container": "#003751",
+                        "glow-blue": "rgba(14, 165, 233, 0.15)",
+                        "on-tertiary-fixed-variant": "#3a485a",
+                        "primary": "#89ceff",
+                        "secondary-fixed": "#e9ddff",
+                        "tertiary-fixed-dim": "#b9c8de",
+                        "secondary-fixed-dim": "#d0bcff",
+                        "surface-container-lowest": "#0a0f13",
+                        "on-primary": "#00344d",
+                        "surface-container-low": "#171c20",
+                        "primary-fixed": "#c9e6ff",
+                        "sapphire-deep": "#051424",
+                        "tertiary-container": "#8e9db2",
+                        "on-secondary-container": "#c4abff",
+                        "primary-container": "#0ea5e9",
+                        "background": "#0f1418",
+                        "surface": "#0f1418",
+                        "outline": "#88929b",
+                        "on-primary-fixed-variant": "#004c6e",
+                        "on-surface": "#dee3e9",
+                        "on-tertiary-fixed": "#0e1c2d",
+                        "on-tertiary-container": "#263446",
+                        "surface-variant": "#30353a",
+                        "tertiary-fixed": "#d5e4fa",
+                        "on-secondary-fixed": "#23005c",
+                        "error-container": "#93000a",
+                        "secondary-container": "#571bc1",
+                        "inverse-surface": "#dee3e9",
+                        "outline-variant": "#3e4850",
+                        "inverse-primary": "#006591"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "md": "2rem",
+                        "xs": "0.5rem",
+                        "sm": "1rem",
+                        "gutter": "2rem",
+                        "xl": "8rem",
+                        "lg": "4rem",
+                        "margin": "2.5rem",
+                        "unit": "4px"
+                    },
+                    fontFamily: {
+                        "headline-md": ["Geist"],
+                        "headline-lg-mobile": ["Geist"],
+                        "display": ["Geist"],
+                        "body-md": ["Geist"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "code-md": ["JetBrains Mono"]
+                    },
+                    fontSize: {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "1.4", "letterSpacing": "0.08em", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "code-md": ["14px", { "lineHeight": "1.7", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .path-line-v { width: 2px; background: linear-gradient(to bottom, #0ea5e9, rgba(14,165,233,0.2)); }
+        .path-line-v-locked { width: 2px; background: rgba(255,255,255,0.1); }
+        .path-line-h { height: 2px; background: #0ea5e9; }
+        .path-line-h-locked { height: 2px; background: rgba(255,255,255,0.1); }
+        .node-glow { box-shadow: 0 0 25px rgba(14, 165, 233, 0.4); }
+        .node-glow-violet { box-shadow: 0 0 25px rgba(167, 139, 250, 0.4); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex overflow-hidden font-body-md">
+<!-- SideNavBar (Shared Component) -->
+<nav class="h-screen w-64 fixed left-0 top-0 border-r border-white/5 shadow-2xl bg-surface-container-lowest flex flex-col py-margin px-xs z-50 group hidden md:flex">
+<!-- Header -->
+<div class="flex items-center gap-sm px-3 mb-lg">
+<div class="w-10 h-10 rounded-lg bg-gradient-to-br from-electric-blue to-soft-violet flex items-center justify-center text-on-primary shadow-[0_0_15px_rgba(14,165,233,0.4)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<div class="font-display text-headline-md font-bold text-electric-blue tracking-tight leading-none">SyntaxCoach</div>
+<div class="text-label-sm text-on-surface-variant mt-1">AI Assistant v2.4</div>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex-1 flex flex-col gap-unit">
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-electric-blue font-bold border-r-2 border-electric-blue bg-glow-blue transition-all duration-300 relative overflow-hidden" href="#">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent to-electric-blue/10 pointer-events-none"></div>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-body-md relative z-10">Roadmap</span>
+</a>
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">code_blocks</span>
+<span class="font-body-md">Sessions</span>
+</a>
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">insights</span>
+<span class="font-body-md">Analytics</span>
+</a>
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+</div>
+<!-- Footer Actions -->
+<div class="mt-auto flex flex-col gap-unit pt-sm border-t border-white/5">
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-body-md">Docs</span>
+</a>
+<a class="flex items-center gap-sm px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-300 mb-sm" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+<span class="font-body-md">Help</span>
+</a>
+<button class="w-full py-3 rounded-lg bg-surface-elevated border border-electric-blue/30 text-electric-blue font-label-sm uppercase tracking-wider hover:bg-electric-blue/10 transition-colors shadow-[0_0_10px_rgba(14,165,233,0.1)] flex items-center justify-center gap-2 group-hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Session
+            </button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col h-screen relative bg-[#050B14]">
+<!-- Ambient Background Glows -->
+<div class="absolute top-0 left-1/4 w-[500px] h-[500px] bg-electric-blue/10 rounded-full blur-[120px] pointer-events-none"></div>
+<div class="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-soft-violet/10 rounded-full blur-[100px] pointer-events-none"></div>
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full h-16 sticky top-0 border-b border-white/10 shadow-[0_0_15px_rgba(14,165,233,0.1)] bg-sapphire-deep/70 backdrop-blur-xl flex justify-between items-center px-gutter z-40">
+<!-- Mobile Brand -->
+<div class="font-display text-headline-md font-bold text-electric-blue tracking-tight md:hidden">
+                SyntaxCoach
+            </div>
+<!-- Search (Left on Desktop) -->
+<div class="hidden md:flex items-center bg-surface-container-high border border-white/5 rounded-full px-4 py-2 w-64 focus-within:border-electric-blue/50 focus-within:ring-1 focus-within:ring-electric-blue/30 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2">search</span>
+<input class="bg-transparent border-none outline-none text-body-md text-on-surface placeholder-on-surface-variant/50 w-full p-0 focus:ring-0" placeholder="Search roadmap..." type="text"/>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-electric-blue hover:bg-white/5 transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-electric-blue rounded-full shadow-[0_0_5px_#0ea5e9]"></span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-electric-blue hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">terminal</span>
+</button>
+<button class="hidden md:block px-4 py-2 rounded-full bg-electric-blue/10 text-electric-blue border border-electric-blue/30 font-label-sm uppercase hover:bg-electric-blue hover:text-on-primary transition-all active:scale-95 duration-200">
+                    Upgrade
+                </button>
+<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-surface-elevated to-surface-container-highest border border-white/20 overflow-hidden cursor-pointer hover:border-electric-blue transition-colors">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A futuristic minimalist avatar placeholder featuring abstract geometric shapes in electric blue and soft violet hues on a dark sapphire background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4hLGUtf7lJ9q82otH7blw6T0ZgaWxdYwBqd60gXi5b-7r6zxKdZ9h7GRFSpxhJgKAtGJA3mR72ejmPWUw8d0n-yiDzTPBENhPgSLiKjoy4U4y8wgT8hFPDV7m-eJStjFWxH1UbIfVWhO3yhGS7oA2VQhi79ecSTJS3P0AV8UPLjIfJpnGzFFcgcxl_eEzVGm-OJvEj_j9VRnxRpU9VXnRV4tdhNtfRrthjCootI8gvr7xesf0hI5V9A"/>
+</div>
+</div>
+</header>
+<!-- Canvas Body -->
+<main class="flex-1 overflow-hidden flex flex-col lg:flex-row relative z-10 p-gutter gap-gutter">
+<!-- Left Canvas Area (Roadmap Tree) -->
+<div class="flex-1 flex flex-col relative h-full">
+<!-- Header & Progress -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+<div>
+<h1 class="font-display text-headline-lg font-bold text-on-surface tracking-tight">Algorithmic Mastery</h1>
+<p class="font-body-md text-on-surface-variant mt-1">Navigate your path to competitive programming excellence.</p>
+</div>
+<!-- Progress Card -->
+<div class="bg-sapphire-deep/50 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center gap-4 shadow-lg min-w-[200px]">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-surface-container-highest" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"></path>
+<path class="text-electric-blue" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="64, 100" stroke-linecap="round" stroke-width="3" style="filter: drop-shadow(0 0 4px rgba(14,165,233,0.5));"></path>
+</svg>
+<span class="absolute text-label-sm text-on-surface font-bold">64%</span>
+</div>
+<div>
+<div class="font-label-sm text-on-surface-variant uppercase tracking-widest text-[10px]">Overall Progress</div>
+<div class="font-body-md text-electric-blue font-semibold">Intermediate Phase</div>
+</div>
+</div>
+</div>
+<!-- Tree Visualization Canvas -->
+<div class="flex-1 bg-surface-container-highest/20 backdrop-blur-sm border border-white/5 rounded-3xl overflow-auto relative p-8 flex justify-center custom-scrollbar shadow-inner">
+<!-- Grid/Flex based Tree Structure -->
+<div class="relative flex flex-col items-center gap-16 pb-32">
+<!-- Tier 1 -->
+<div class="relative z-10">
+<div class="w-16 h-16 rounded-2xl bg-glow-blue border-2 border-electric-blue flex items-center justify-center text-electric-blue node-glow cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-electric-blue">Syntax Basics</div>
+<!-- Line down -->
+<div class="absolute top-16 left-1/2 -translate-x-1/2 h-16 path-line-v -z-10"></div>
+</div>
+<!-- Tier 2 -->
+<div class="relative z-10 flex gap-32">
+<!-- Horizontal connection line for tier 2 -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 path-line-h -z-10"></div>
+<!-- Left Branch -->
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-glow-blue border-2 border-electric-blue flex items-center justify-center text-electric-blue node-glow cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">data_object</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-electric-blue">Data Structures</div>
+<div class="absolute top-16 left-1/2 -translate-x-1/2 h-16 path-line-v -z-10"></div>
+</div>
+<!-- Right Branch -->
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-glow-blue border-2 border-electric-blue flex items-center justify-center text-electric-blue node-glow cursor-pointer hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">function</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-electric-blue">Algorithms I</div>
+<div class="absolute top-16 left-1/2 -translate-x-1/2 h-16 path-line-v -z-10"></div>
+</div>
+</div>
+<!-- Tier 3 -->
+<div class="relative z-10 flex gap-16">
+<!-- Selected Node -->
+<div class="relative">
+<div class="w-20 h-20 rounded-2xl bg-soft-violet/20 border-2 border-soft-violet flex items-center justify-center text-soft-violet node-glow-violet ring-4 ring-soft-violet/10 cursor-pointer scale-110 z-20">
+<span class="material-symbols-outlined text-[32px]" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-3 whitespace-nowrap font-label-sm text-soft-violet font-bold">Dynamic Prog.</div>
+<div class="absolute top-20 left-1/2 -translate-x-1/2 h-12 path-line-v-locked -z-10"></div>
+</div>
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-surface-container border border-white/10 flex items-center justify-center text-on-surface-variant opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined text-[28px]">schema</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-on-surface-variant opacity-60">Graph Theory</div>
+<div class="absolute top-16 left-1/2 -translate-x-1/2 h-16 path-line-v-locked -z-10"></div>
+</div>
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-surface-container border border-white/10 flex items-center justify-center text-on-surface-variant opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined text-[28px]">calculate</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-on-surface-variant opacity-60">Math &amp; Number</div>
+</div>
+</div>
+<!-- Tier 4 -->
+<div class="relative z-10 flex gap-24">
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-surface-container border border-white/10 flex items-center justify-center text-on-surface-variant opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined text-[28px]">lock</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-on-surface-variant opacity-60">Adv. DP Trees</div>
+</div>
+<div class="relative">
+<div class="w-16 h-16 rounded-2xl bg-surface-container border border-white/10 flex items-center justify-center text-on-surface-variant opacity-60 cursor-not-allowed">
+<span class="material-symbols-outlined text-[28px]">lock</span>
+</div>
+<div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 whitespace-nowrap font-label-sm text-on-surface-variant opacity-60">Network Flow</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar Panel (Node Details) -->
+<aside class="w-full lg:w-96 bg-sapphire-deep/60 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-col shadow-2xl relative overflow-hidden h-full">
+<!-- Decorative top glow -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-soft-violet to-transparent opacity-50"></div>
+<!-- Node Header -->
+<div class="flex items-start justify-between mb-6">
+<div class="w-14 h-14 rounded-xl bg-soft-violet/20 border border-soft-violet/50 flex items-center justify-center text-soft-violet mb-4 shadow-[0_0_15px_rgba(167,139,250,0.2)]">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">account_tree</span>
+</div>
+<div class="px-3 py-1 rounded-full bg-surface-container border border-white/10 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-electric-blue">stars</span>
+<span class="font-label-sm text-electric-blue">+500 XP</span>
+</div>
+</div>
+<h2 class="font-display text-headline-md font-bold text-on-surface mb-2">Dynamic Programming</h2>
+<div class="flex gap-2 mb-6">
+<span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase tracking-wider bg-electric-blue/10 text-electric-blue border border-electric-blue/20">Core Skill</span>
+<span class="px-2 py-0.5 rounded text-[10px] font-label-sm uppercase tracking-wider bg-soft-violet/10 text-soft-violet border border-soft-violet/20">Hard</span>
+</div>
+<p class="font-body-md text-on-surface-variant mb-8">
+                    Master the art of breaking down complex problems into simpler subproblems. Learn memoization and tabulation techniques to optimize recursive algorithms.
+                </p>
+<!-- Requirements Section -->
+<div class="mb-auto">
+<h3 class="font-label-sm text-on-surface-variant uppercase tracking-widest mb-4">Prerequisites</h3>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 bg-surface-container/50 p-3 rounded-lg border border-white/5">
+<span class="material-symbols-outlined text-electric-blue text-[20px]">check_circle</span>
+<span class="font-code-md text-on-surface text-sm">Recursion Basics</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container/50 p-3 rounded-lg border border-white/5">
+<span class="material-symbols-outlined text-electric-blue text-[20px]">check_circle</span>
+<span class="font-code-md text-on-surface text-sm">Time Complexity Analysis</span>
+</div>
+</div>
+<h3 class="font-label-sm text-on-surface-variant uppercase tracking-widest mt-8 mb-4">Key Concepts</h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-md bg-surface-container-highest text-on-surface text-xs font-code-md border border-white/5">Memoization</span>
+<span class="px-3 py-1.5 rounded-md bg-surface-container-highest text-on-surface text-xs font-code-md border border-white/5">Tabulation</span>
+<span class="px-3 py-1.5 rounded-md bg-surface-container-highest text-on-surface text-xs font-code-md border border-white/5">State Transition</span>
+</div>
+</div>
+<!-- CTA -->
+<div class="pt-6 border-t border-white/10 mt-6">
+<button class="w-full bg-gradient-to-r from-electric-blue to-soft-violet text-on-primary font-headline-md text-base rounded-xl py-4 hover:shadow-[0_0_25px_rgba(167,139,250,0.5)] transition-all duration-300 active:scale-95 flex justify-center items-center gap-2 group">
+                        Start Challenge
+                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+<div class="text-center mt-3">
+<span class="font-label-sm text-on-surface-variant text-[10px] uppercase">Est. Time: 45 Mins</span>
+</div>
+</div>
+</aside>
+</main>
+</div>
+</body></html>
