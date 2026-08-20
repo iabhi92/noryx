@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getAllProblems, getAllSessions, getAllSubmissions } from '../lib/storage';
 import { formatDuration } from '../lib/format';
-import type { CodingSession, StoredSubmission } from '../lib/types';
+import { computeStreak } from '../lib/stats';
+import type { StoredSubmission } from '../lib/types';
 import Sidebar from './components/Sidebar';
 import StatTile from './components/StatTile';
 import ProblemsTable, { type ProblemRow } from './components/ProblemsTable';
@@ -21,17 +22,6 @@ function rankFor(solved: number): string {
   return 'Getting Started';
 }
 
-function computeStreak(sessions: CodingSession[]): number {
-  if (sessions.length === 0) return 0;
-  const days = new Set(sessions.map((s) => new Date(s.startedAt).toDateString()));
-  let streak = 0;
-  const cursor = new Date();
-  while (days.has(cursor.toDateString())) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
 
 export default function App() {
   const [view, setView] = useState<'dashboard' | 'sessions' | 'analytics' | 'roadmap' | 'settings'>('dashboard');

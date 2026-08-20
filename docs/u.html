@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Noryx — Coding Progress</title>
+<meta name="robots" content="noindex" />
+<link rel="icon" href="assets/icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --background: #0f1418;
+    --sapphire-deep: #051424;
+    --surface-container: #1b2024;
+    --surface-container-highest: #30353a;
+    --on-surface: #dee3e9;
+    --on-surface-variant: #bec8d2;
+    --electric-blue: #0ea5e9;
+    --soft-violet: #a78bfa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background: var(--background);
+    background-image:
+      radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.10) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.10) 0px, transparent 50%);
+    color: var(--on-surface);
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 64px 24px; }
+  .text-gradient {
+    background: linear-gradient(to right, var(--electric-blue), var(--soft-violet));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .glass-card {
+    background: rgba(5, 20, 36, 0.7);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(14, 165, 233, 0.2);
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
+    border-radius: 1rem;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin: 0 0 6px; }
+  .sub { color: var(--on-surface-variant); font-size: 14px; margin: 0 0 32px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-tile { padding: 16px; }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--on-surface-variant); margin-bottom: 6px;
+  }
+  .stat-value {
+    font-size: 32px; font-weight: 700; color: var(--electric-blue);
+    filter: drop-shadow(0 0 10px rgba(14,165,233,0.4));
+  }
+  .panel { padding: 20px; margin-bottom: 16px; }
+  .panel h3 { font-size: 15px; margin: 0 0 14px; }
+  .bar-row { margin-bottom: 12px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--on-surface-variant); margin-bottom: 4px; text-transform: capitalize; }
+  .bar-track { width: 100%; height: 8px; background: var(--surface-container-highest); border-radius: 999px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(to right, var(--electric-blue), var(--soft-violet)); box-shadow: 0 0 8px rgba(14,165,233,0.6); }
+  .empty, .error, .loading { text-align: center; color: var(--on-surface-variant); padding: 48px 0; }
+  footer { text-align: center; margin-top: 32px; font-size: 13px; color: var(--on-surface-variant); }
+  footer a { color: var(--electric-blue); text-decoration: none; }
+  .updated { text-align: right; font-size: 11px; color: var(--on-surface-variant); margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1><span class="text-gradient">Noryx</span> — Coding Progress</h1>
+    <p class="sub">Automatically tracked while solving on LeetCode, Codeforces, and other coding platforms.</p>
+    <div id="root"><p class="loading">Loading…</p></div>
+    <footer>Built with <a href="https://github.com/iabhi92/noryx" target="_blank" rel="noopener">Noryx</a>, an AI coding coach.</footer>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://jliflngpelahaprxsziq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_v1S6u0JdZ3-E4BuovTxMww_FY_W5iP2';
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function barsFor(counts, max) {
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6)
+        .map(([label, value]) => `
+          <div class="bar-row">
+            <div class="bar-label"><span>${escapeHtml(label)}</span><span>${value}</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.round((value / max) * 100)}%"></div></div>
+          </div>
+        `).join('');
+    }
+
+    async function main() {
+      const root = document.getElementById('root');
+      const id = new URLSearchParams(location.search).get('id');
+      if (!id) {
+        root.innerHTML = '<p class="error">No profile id in the link.</p>';
+        return;
+      }
+
+      let profile;
+      try {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/public_profiles?id=eq.${encodeURIComponent(id)}&select=solved,streak,success_rate,platform_counts,topic_highlights,updated_at`,
+          { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } },
+        );
+        if (!res.ok) throw new Error(`${res.status}`);
+        const rows = await res.json();
+        profile = rows[0];
+      } catch {
+        root.innerHTML = '<p class="error">Couldn\'t load this profile right now. Try again in a moment.</p>';
+        return;
+      }
+
+      if (!profile) {
+        root.innerHTML = '<p class="empty">This profile doesn\'t exist or was removed.</p>';
+        return;
+      }
+
+      const platformCounts = profile.platform_counts || {};
+      const topicHighlights = profile.topic_highlights || {};
+      const maxPlatform = Math.max(1, ...Object.values(platformCounts));
+      const maxTopic = Math.max(1, ...Object.values(topicHighlights));
+
+      root.innerHTML = `
+        <div class="stat-grid">
+          <div class="glass-card stat-tile">
+            <div class="stat-label">✅ Problems Solved</div>
+            <div class="stat-value">${profile.solved}</div>
+          </div>
+          <div class="glass-card stat-tile">
+            <div class="stat-label">🔥 Current Streak</div>
+            <div class="stat-value">${profile.streak}d</div>
+          </div>
+          <div class="glass-card stat-tile">
+            <div class="stat-label">🎯 Success Rate</div>
+            <div class="stat-value">${profile.success_rate}%</div>
+          </div>
+          <div class="glass-card stat-tile">
+            <div class="stat-label">🌐 Platforms</div>
+            <div class="stat-value" style="font-size:20px">${Object.keys(platformCounts).length || '—'}</div>
+          </div>
+        </div>
+        ${Object.keys(platformCounts).length ? `<div class="glass-card panel"><h3>🌐 Platform mix</h3>${barsFor(platformCounts, maxPlatform)}</div>` : ''}
+        ${Object.keys(topicHighlights).length ? `<div class="glass-card panel"><h3>🧠 Topic strengths</h3>${barsFor(topicHighlights, maxTopic)}</div>` : ''}
+        <p class="updated">Last updated ${new Date(profile.updated_at).toLocaleString()}</p>
+      `;
+    }
+
+    main();
+  </script>
+</body>
+</html>

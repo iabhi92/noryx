@@ -12,7 +12,23 @@ import { problemKey, type HintLevel } from '../lib/types';
 import { getSettings } from '../lib/settings';
 import { shouldIntervene, MAX_AUTO_HINT_LEVEL } from '../lib/ai/intervention';
 import { GeminiProvider } from '../lib/ai/gemini-provider';
+import { syncPublicProfile } from '../lib/publicProfile';
 import type { RuntimeMessage } from '../lib/messages';
+
+// Throttled so a public-profile owner's heartbeats (every 15s per tracked tab) don't turn into a
+// request storm — syncPublicProfile() itself already no-ops when no profile is enabled.
+const PROFILE_SYNC_INTERVAL_MS = 2 * 60 * 1000;
+let lastProfileSyncAt = 0;
+
+async function maybeSyncPublicProfile(): Promise<void> {
+  if (Date.now() - lastProfileSyncAt < PROFILE_SYNC_INTERVAL_MS) return;
+  lastProfileSyncAt = Date.now();
+  try {
+    await syncPublicProfile();
+  } catch (err) {
+    console.warn('[Noryx] public profile sync failed:', err);
+  }
+}
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
   void handleMessage(message);
@@ -40,10 +56,12 @@ async function handleMessage(message: RuntimeMessage): Promise<void> {
     case 'HEARTBEAT':
       await applyHeartbeat(message.problemKey, message.activeDeltaMs, message.idleDeltaMs, message.tabSwitchInc);
       void maybeIntervene(message.problemKey);
+      void maybeSyncPublicProfile();
       break;
     case 'SUBMISSION':
       await recordSubmission(message.problemKey, message.submission);
       void maybeIntervene(message.problemKey);
+      void maybeSyncPublicProfile();
       break;
   }
 }

@@ -2,6 +2,7 @@ const SETTINGS_KEY = 'noryx:settings';
 
 export interface NoryxSettings {
   geminiApiKey?: string;
+  publicProfile?: { id: string; writeToken: string };
 }
 
 export async function getSettings(): Promise<NoryxSettings> {
