@@ -1,4 +1,4 @@
-import type { HintProvider, HintContext, Hint } from './types';
+import type { HintProvider, HintContext, Hint, ProgressContext, ProgressInsight } from './types';
 import { AIProviderError } from './types';
 
 // Gemini Flash-Lite class model per the PRD's "free-tier access" requirement. Verified live
@@ -16,7 +16,7 @@ const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
 };
 
 function buildPrompt(context: HintContext): string {
-  const { problem, submissions, level } = context;
+  const { problem, submissions, level, userMessage } = context;
   const language = submissions[submissions.length - 1]?.language ?? 'the user\'s chosen language';
   const history = submissions.length
     ? submissions.map((s, i) => `  ${i + 1}. ${s.status}`).join('\n')
@@ -31,11 +31,39 @@ function buildPrompt(context: HintContext): string {
     `Language: ${language}`,
     `Submission history for this session:\n${history}`,
     '',
-    `Task: ${LEVEL_INSTRUCTIONS[level]}`,
+    userMessage
+      ? `The user says: "${userMessage}"\nRespond to what they said, while staying within this constraint: ${LEVEL_INSTRUCTIONS[level]}`
+      : `Task: ${LEVEL_INSTRUCTIONS[level]}`,
     'Keep the response under 80 words unless writing a solution.',
   ]
     .filter((line): line is string => line !== null)
     .join('\n');
+}
+
+function buildRoadmapPrompt(context: ProgressContext): string {
+  const { totalSolved, totalAttempted, successRate, platformCounts, difficultyCounts, topicCounts } = context;
+
+  const formatCounts = (counts: Record<string, number>) =>
+    Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([label, n]) => `${label}: ${n}`)
+      .join(', ') || '(none tracked)';
+
+  return [
+    'You are Noryx, an AI coding tutor building a short personalized DSA practice roadmap for this',
+    'user, based only on the real activity below — never invent specific problems or stats not',
+    'given here. If the history is thin, say so plainly and lean on general beginner-appropriate',
+    "progression advice instead of pretending to see patterns that aren't really there.",
+    '',
+    `Problems solved: ${totalSolved} / ${totalAttempted} attempted (${successRate}% success rate)`,
+    `Platforms: ${formatCounts(platformCounts)}`,
+    `Difficulty labels seen (raw, per-platform — scales aren't comparable across platforms): ${formatCounts(difficultyCounts)}`,
+    `Topics seen (often sparse — most platforms don't expose this pre-solve): ${formatCounts(topicCounts)}`,
+    '',
+    'Task: write a short roadmap — 3 to 5 concrete focus areas or next steps, each one sentence,',
+    "as a plain list. End with one sentence of encouragement. Keep the whole thing under 150 words.",
+    'Never write code.',
+  ].join('\n');
 }
 
 interface GeminiResponse {
@@ -45,8 +73,7 @@ interface GeminiResponse {
 export class GeminiProvider implements HintProvider {
   constructor(private apiKey: string) {}
 
-  async generateHint(context: HintContext): Promise<Hint> {
-    const prompt = buildPrompt(context);
+  private async callGemini(prompt: string): Promise<string> {
     const url = `${API_BASE}/${MODEL}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
 
     let response: Response;
@@ -75,7 +102,16 @@ export class GeminiProvider implements HintProvider {
     if (!text) {
       throw new AIProviderError('Gemini returned an empty response — try again.');
     }
+    return text;
+  }
 
+  async generateHint(context: HintContext): Promise<Hint> {
+    const text = await this.callGemini(buildPrompt(context));
     return { level: context.level, text };
+  }
+
+  async analyzeProgress(context: ProgressContext): Promise<ProgressInsight> {
+    const text = await this.callGemini(buildRoadmapPrompt(context));
+    return { text, generatedAt: Date.now() };
   }
 }

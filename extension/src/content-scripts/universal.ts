@@ -3,6 +3,7 @@ import { problemKey } from '../lib/types';
 import type { RuntimeMessage } from '../lib/messages';
 import type { CodingPlatformAdapter } from '../lib/adapters/types';
 import type { Stoppable } from '../lib/adapters/dom-heuristics';
+import { mountOverlay } from './overlay';
 
 const HEARTBEAT_INTERVAL_MS = 15000;
 // ponytail: pushState-patch + popstate covers most SPA routers; the poll is a cheap fallback for
@@ -82,12 +83,14 @@ async function trackCurrentPage(): Promise<() => void> {
   send({ type: 'SESSION_START', problem: { ...problem, ...metadata } });
 
   const stopHeartbeat = runHeartbeat(key);
+  const unmountOverlay = mountOverlay(key, { ...problem, ...metadata });
   let cancelled = false;
   void runSubmissionLoop(adapter, key, () => cancelled);
 
   return () => {
     cancelled = true;
     stopHeartbeat();
+    unmountOverlay();
     if (isStoppable(adapter)) adapter.stop();
   };
 }

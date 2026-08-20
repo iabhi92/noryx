@@ -64,27 +64,32 @@ that tries adapters in order and uses the first one that matches the page:
 
 ### Verified per-platform status
 
-Fetched each site's real (logged-out) HTML from this environment to check what's actually there,
-rather than guess. Findings, honestly:
+Fetched each site's real HTML from this environment to check what's actually there, rather than
+guess — logged-out, via a real AppleScript-driven Safari session (`source of document 1` for
+server-rendered sites; `do JavaScript "document.documentElement.outerHTML"` for client-rendered
+SPAs, which needs Safari → Settings → Developer → "Allow JavaScript from Apple Events" enabled).
+Findings, honestly:
 
 | Platform | Reachable? | Editor on the problem page? | Notes |
 |---|---|---|---|
-| **LeetCode** | `curl`/`WebFetch` blocked by Cloudflare — but a real, AppleScript-driven Safari session passes the same challenge normal browsing does | **Confirmed** — `.monaco-editor` present | Hardened against the live DOM: difficulty via `[class*="text-difficulty-"]`, Run/Submit buttons and the verdict panel via LeetCode's own `data-e2e-locator` test-ids (`console-run-button` / `console-submit-button` / `console-result`), runtime via a confirmed `Runtime: N ms` sibling text. This also caught a real bug — Run and Submit render into the *same* result element, so without tracking which button was clicked, every debug Run during iteration would've been miscounted as a submission attempt; fixed via click-tracking in `LeetCodeSubmissionWatcher`. |
-| Codeforces | No — Cloudflare challenge (didn't retry with real Safari here; same technique should work) | — | Falls through to the generic adapter, unverified. |
-| **HackerRank** | Yes | **Confirmed** — `.monaco-editor` present | Difficulty confirmed as isolated leaf text ("Easy" inside a `.difficulty-easy` badge) — the generic adapter's heuristics should work here as built. |
-| AtCoder | Yes | Not on the problem/task page — the submit form lives on a separate URL (classic multi-page site, not a SPA) | Should work once the user is actually on the submit page (manifest matches the whole domain); untested. |
-| CodeChef | Yes | Not found in the static HTML | Editor likely loads via a separate mechanism not visible logged-out. Unverified. |
+| **LeetCode** | `curl`/`WebFetch` blocked by Cloudflare — but a real Safari session passes the same challenge normal browsing does | **Confirmed** — `.monaco-editor` present | Hardened against the live DOM: difficulty via `[class*="text-difficulty-"]`, Run/Submit buttons and the verdict panel via LeetCode's own `data-e2e-locator` test-ids (`console-run-button` / `console-submit-button` / `console-result`), runtime via a confirmed `Runtime: N ms` sibling text. This also caught a real bug — Run and Submit render into the *same* result element, so without tracking which button was clicked, every debug Run during iteration would've been miscounted as a submission attempt; fixed via click-tracking in `LeetCodeSubmissionWatcher`. |
+| **Codeforces** | Yes, with real Safari | Confirmed **absent** — problem-statement page is server-rendered with no editor; `/problemset/submit` redirects back without a session | Dedicated `CodeforcesAdapter`: title + topics + numeric rating (rendered as a pseudo-tag with `title="Difficulty"`, e.g. "\*800") all confirmed via real DOM. Submission requires login — unverified, falls back to the shared best-effort status-text watcher. |
+| **HackerRank** | Yes | **Confirmed** — `.monaco-editor` present | Difficulty confirmed as isolated leaf text ("Easy" inside a `.difficulty-easy` badge) — the generic adapter's heuristics work here as built, no dedicated adapter needed. |
+| **AtCoder** | Yes | Confirmed **absent** on the task page; submit page (`/contests/{id}/submit`) redirects straight to `/login` logged out | Dedicated `AtCoderAdapter`: title + point value (`<p>Score : <var>N</var> points</p>`, used as the difficulty proxy — no topic/tag system on-site) confirmed via real DOM. Submission unverified past the login wall, same best-effort fallback. |
+| **CodeChef** | Yes, but fully client-rendered (`<div id="root">`) — a plain fetch sees none of it | **Confirmed** — `.ace_editor` present, `#submit_btn` + a "Run" leaf, once hydrated | Dedicated `CodeChefAdapter`: title + numeric difficulty rating (a bare number next to a "Difficulty:" label, no Easy/Medium/Hard tier) confirmed via real hydrated DOM. No stable topic markup found. |
 | Kattis | Yes | None on the anonymous problem page — no editor, no file-upload form | Difficulty extraction confirmed to work (isolated "Easy" text), but submission itself is probably behind login. Won't be detected as-is. |
 | CSES | Yes | None found logged-out | Same story as Kattis — likely needs an authenticated session to see the real submission UI. |
-| GeeksforGeeks | Yes | Not found in the static HTML (likely client-rendered after hydration) | Difficulty exists as embedded JSON (`"difficulty":"Basic"` — GFG has a 4th tier below Easy, now supported by widening `ProblemMetadata.difficulty` to a plain string) but isn't confirmed as visible leaf text. |
+| **GeeksforGeeks** | Yes, but fully client-rendered (`<div id="__next">`) — same story as CodeChef | **Confirmed** — `.ace_editor` present, a "Submit" button, once hydrated | Dedicated `GeeksforGeeksAdapter`: title (via `og:title`, stripping the "\| Practice \| GeeksforGeeks" suffix) + difficulty (confirmed isolated leaf text, including the "Basic" tier below Easy) via real hydrated DOM. |
 | HackerEarth | Not probed | — | No confidently-known problem URL to test against. |
 
-Net: the generic adapter's shape (in-page editor + Run/Submit control) matches how LeetCode and
-HackerRank actually work. Several others don't fit that shape at all when logged out — that's a
-real gap, not a guess dressed up as one. Closing it needs real DOM from a logged-in session on each
-platform — the same technique that hardened LeetCode (driving a real, already-authenticated Safari
-session) should work for the Cloudflare-blocked ones too; the rest just need a look at their
-authenticated submission flow specifically, since that's the part that doesn't show up logged out.
+Net: seven of nine platforms now have a real, DOM-verified detection path (five dedicated adapters
+plus LeetCode and HackerRank). The common thread among the four newest: Codeforces and AtCoder are
+server-rendered but wall off the actual submit/verdict page behind login; CodeChef and GFG are
+fully client-rendered SPAs where even the *problem page* needs a real hydrated session to read at
+all. On all four, problem/metadata detection is confirmed live; submission detection past the
+login wall is unverified and falls back to the shared best-effort status-text watcher (same
+honesty bar as the rest of this table) — closing that gap needs real DOM from an authenticated
+session on each site. Kattis, CSES, and HackerEarth remain untouched.
 
 One SPA-navigation bug this investigation did surface and fix: several of these are React
 frontends that can switch problems via client-side routing (no full page reload), which would have

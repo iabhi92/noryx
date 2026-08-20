@@ -35,7 +35,7 @@ const CANONICAL_STATUSES: Array<{ pattern: RegExp; status: SubmissionStatus }> =
   { pattern: /^memory limit exceeded$/i, status: 'Memory Limit Exceeded' },
 ];
 
-function matchStatus(text: string): SubmissionStatus | null {
+export function matchStatus(text: string): SubmissionStatus | null {
   return CANONICAL_STATUSES.find((rule) => rule.pattern.test(text))?.status ?? null;
 }
 

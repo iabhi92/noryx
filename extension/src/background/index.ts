@@ -18,6 +18,17 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
   void handleMessage(message);
 });
 
+// Safari has no chrome.notifications (see the guard below), so an auto-generated hint would
+// otherwise land silently in storage with nothing telling the user it happened — defeating the
+// PRD's actual point that coaching should be proactive, not something you have to go check for.
+// The toolbar badge is the one native, cross-platform "something happened" signal available here.
+let unseenHints = 0;
+
+function updateBadge(): void {
+  chrome.action.setBadgeText({ text: unseenHints > 0 ? String(unseenHints) : '' });
+  chrome.action.setBadgeBackgroundColor({ color: '#0ea5e9' });
+}
+
 async function handleMessage(message: RuntimeMessage): Promise<void> {
   switch (message.type) {
     case 'SESSION_START': {
@@ -62,12 +73,19 @@ async function maybeIntervene(key: string): Promise<void> {
     await addHint({ sessionId: session.id, level: hint.level, text: hint.text, createdAt: now, auto: true });
     await updateSessionHintState(session.id, nextLevel, now);
 
-    chrome.notifications.create(`noryx-hint-${session.id}-${now}`, {
-      type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-      title: `Noryx · ${problem.title}`,
-      message: hint.text,
-    });
+    unseenHints += 1;
+    updateBadge();
+
+    // Safari's WebExtension implementation doesn't have chrome.notifications — the hint is
+    // still stored via addHint() above, and now badged, just not shown as a system notification.
+    if (chrome.notifications) {
+      chrome.notifications.create(`noryx-hint-${session.id}-${now}`, {
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+        title: `Noryx · ${problem.title}`,
+        message: hint.text,
+      });
+    }
   } catch (err) {
     // Conservative-by-design: a failed hint (bad key, rate limit, network) should never crash
     // the service worker or block tracking. It just quietly doesn't nudge this time.
@@ -75,10 +93,14 @@ async function maybeIntervene(key: string): Promise<void> {
   }
 }
 
-chrome.notifications.onClicked.addListener(() => {
-  void chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/index.html') });
-});
+if (chrome.notifications) {
+  chrome.notifications.onClicked.addListener(() => {
+    void chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/index.html') });
+  });
+}
 
 chrome.action.onClicked.addListener(() => {
+  unseenHints = 0;
+  updateBadge();
   void chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/index.html') });
 });

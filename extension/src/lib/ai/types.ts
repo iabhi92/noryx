@@ -1,20 +1,39 @@
-import type { StoredProblem, CodingSession, StoredSubmission, HintLevel } from '../types';
+import type { Problem, ProblemMetadata, CodingSession, StoredSubmission, HintLevel } from '../types';
 
-// Shape TBD — analyzeSession/analyzeProgress belong to personal memory (PRD §10-11) and
-// analyzeSolution to post-solve analytics (§12), neither built yet. Declared as `unknown` so
-// AIProvider's shape matches the PRD without pretending these are implemented by anything.
+// Shape TBD — analyzeSession belongs to personal memory (PRD §10-11) and analyzeSolution to
+// post-solve analytics (§12), neither built yet. Declared as `unknown` so AIProvider's shape
+// matches the PRD without pretending these are implemented by anything.
 export type SessionContext = unknown;
 export type AIAnalysis = unknown;
 export type SolutionContext = unknown;
 export type SolutionAnalysis = unknown;
-export type ProgressContext = unknown;
-export type ProgressInsight = unknown;
+
+// Only ever built from real tracked data (storage.ts) — counts as observed, nothing invented.
+// difficultyCounts and topicCounts are keyed by whatever raw label the platform showed (a
+// LeetCode "Easy" and a Codeforces "*800" both land here as separate keys — no cross-platform
+// scale unification, same rule as ProblemMetadata.difficulty in lib/types.ts). topicCounts will
+// often be sparse: most adapters don't expose topics pre-solve (see leetcode.ts), so this is
+// realistically populated mainly from Codeforces sessions today.
+export interface ProgressContext {
+  totalSolved: number;
+  totalAttempted: number;
+  successRate: number;
+  platformCounts: Record<string, number>;
+  difficultyCounts: Record<string, number>;
+  topicCounts: Record<string, number>;
+}
+
+export interface ProgressInsight {
+  text: string;
+  generatedAt: number;
+}
 
 export interface HintContext {
-  problem: StoredProblem;
+  problem: Problem & ProblemMetadata;
   session: CodingSession;
   submissions: StoredSubmission[];
   level: HintLevel | 'solution';
+  userMessage?: string;
 }
 
 export interface Hint {

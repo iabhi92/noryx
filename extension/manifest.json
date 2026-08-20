@@ -36,7 +36,7 @@
       "run_at": "document_idle"
     }
   ],
-  "permissions": ["storage", "tabs", "notifications"],
+  "permissions": ["storage", "tabs"],
   "host_permissions": [
     "https://leetcode.com/*",
     "https://codeforces.com/*",

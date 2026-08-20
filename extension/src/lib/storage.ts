@@ -8,12 +8,14 @@ import type {
   StoredHint,
   HintLevel,
 } from './types';
+import type { ProgressInsight } from './ai/types';
 
 const KEYS = {
   problems: 'noryx:problems',
   sessions: 'noryx:sessions',
   submissions: 'noryx:submissions',
   hints: 'noryx:hints',
+  roadmap: 'noryx:roadmap',
 } as const;
 
 async function getMap<T>(key: string): Promise<Record<string, T>> {
@@ -65,6 +67,7 @@ export async function applyHeartbeat(
     activeMs: session.activeMs + activeDeltaMs,
     idleMs: session.idleMs + idleDeltaMs,
     tabSwitches: session.tabSwitches + tabSwitchInc,
+    lastHeartbeatAt: Date.now(),
   };
   await setMap(KEYS.sessions, sessions);
 }
@@ -116,6 +119,19 @@ export async function addHint(hint: Omit<StoredHint, 'id'>): Promise<StoredHint>
 export async function getHintsForSession(sessionId: string): Promise<StoredHint[]> {
   const hints = await getMap<StoredHint[]>(KEYS.hints);
   return hints[sessionId] ?? [];
+}
+
+export async function getAllHints(): Promise<Record<string, StoredHint[]>> {
+  return getMap<StoredHint[]>(KEYS.hints);
+}
+
+export async function getRoadmap(): Promise<ProgressInsight | null> {
+  const result = await chrome.storage.local.get(KEYS.roadmap);
+  return (result[KEYS.roadmap] as ProgressInsight) ?? null;
+}
+
+export async function saveRoadmap(insight: ProgressInsight): Promise<void> {
+  await chrome.storage.local.set({ [KEYS.roadmap]: insight });
 }
 
 export async function updateSessionHintState(
