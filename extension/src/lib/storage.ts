@@ -11,6 +11,7 @@ import type {
   InterviewEvaluation,
   StoredInterview,
   ReviewState,
+  PracticeProblem,
 } from './types';
 import type { ProgressInsight } from './ai/types';
 
@@ -22,6 +23,7 @@ const KEYS = {
   roadmap: 'noryx:roadmap',
   interviews: 'noryx:interviews',
   reviews: 'noryx:reviews',
+  practiceProblem: 'noryx:practiceProblem',
 } as const;
 
 // Leitner boxes: index = box number, value = days until next due. Correct recall advances a
@@ -200,6 +202,15 @@ export async function recordReviewOutcome(problemKey: string, remembered: boolea
   reviews[problemKey] = updated;
   await setMap(KEYS.reviews, reviews);
   return updated;
+}
+
+export async function getPracticeProblem(): Promise<PracticeProblem | null> {
+  const result = await chrome.storage.local.get(KEYS.practiceProblem);
+  return (result[KEYS.practiceProblem] as PracticeProblem) ?? null;
+}
+
+export async function savePracticeProblem(problem: PracticeProblem): Promise<void> {
+  await chrome.storage.local.set({ [KEYS.practiceProblem]: problem });
 }
 
 export async function updateSessionHintState(

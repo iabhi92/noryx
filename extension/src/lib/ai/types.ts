@@ -1,4 +1,12 @@
-import type { Problem, ProblemMetadata, CodingSession, StoredSubmission, HintLevel, InterviewTurn } from '../types';
+import type {
+  Problem,
+  ProblemMetadata,
+  CodingSession,
+  StoredSubmission,
+  HintLevel,
+  InterviewTurn,
+  PracticeTestCase,
+} from '../types';
 
 // Shape TBD — analyzeSession belongs to personal memory (PRD §10-11) and analyzeSolution to
 // post-solve analytics (§12), neither built yet. Declared as `unknown` so AIProvider's shape
@@ -46,6 +54,18 @@ export interface InterviewContext {
   turns: InterviewTurn[];
   submissions: StoredSubmission[];
   elapsedMs: number;
+}
+
+// What the model claims, before lib/practiceVerify.ts actually runs referenceSolutionJS against
+// testCases and finds out which of that claim holds up.
+export interface GeneratedPracticeProblem {
+  title: string;
+  statement: string;
+  difficulty: string;
+  topics: string[];
+  functionName: string;
+  testCases: PracticeTestCase[];
+  referenceSolutionJS: string;
 }
 
 /** Per the PRD: keep the AI layer provider-agnostic. Only `generateHint` has a caller today —

@@ -1,4 +1,12 @@
-import type { HintProvider, HintContext, Hint, ProgressContext, ProgressInsight, InterviewContext } from './types';
+import type {
+  HintProvider,
+  HintContext,
+  Hint,
+  ProgressContext,
+  ProgressInsight,
+  InterviewContext,
+  GeneratedPracticeProblem,
+} from './types';
 import { AIProviderError } from './types';
 import type { InterviewEvaluation } from '../types';
 
@@ -138,6 +146,25 @@ function buildInterviewEvalPrompt(context: InterviewContext): string {
   ].join('\n');
 }
 
+function buildPracticeProblemPrompt(topic: string, difficulty: string): string {
+  return [
+    'You are Noryx, generating an original DSA practice problem (not a copy of a known',
+    "LeetCode/Codeforces/etc. problem) for a user practicing a specific topic.",
+    '',
+    `Topic focus: ${topic}`,
+    `Target difficulty: ${difficulty}`,
+    '',
+    'Respond with ONLY a JSON object, no markdown fences, no other text, in exactly this shape:',
+    '{"title": "...", "statement": "self-contained problem description in plain English, ' +
+      'including the function signature, input/output format, and constraints", ' +
+      `"difficulty": "${difficulty}", "topics": ["..."], "functionName": "camelCaseName", ` +
+      '"testCases": [{"args": [<json values matching the function parameters in order>], ' +
+      '"expected": <json value>}, ... 4 to 6 cases including at least one edge case], ' +
+      '"referenceSolutionJS": "a single complete correct JavaScript function declaration named ' +
+      'exactly functionName that solves it — no explanation, no markdown fences, no other code"}',
+  ].join('\n');
+}
+
 interface GeminiResponse {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 }
@@ -214,5 +241,34 @@ export class GeminiProvider implements HintProvider {
       // flow, just degrade to an honest "couldn't score this" rather than fabricated numbers.
       throw new AIProviderError("Gemini's evaluation wasn't in the expected format — try again.");
     }
+  }
+
+  async generatePracticeProblem(topic: string, difficulty: string): Promise<GeneratedPracticeProblem> {
+    const raw = await this.callGemini(buildPracticeProblemPrompt(topic, difficulty), true);
+    let parsed: Partial<GeneratedPracticeProblem>;
+    try {
+      parsed = JSON.parse(raw) as Partial<GeneratedPracticeProblem>;
+    } catch {
+      throw new AIProviderError("Gemini's problem generation wasn't valid JSON — try again.");
+    }
+    if (
+      typeof parsed.title !== 'string' ||
+      typeof parsed.statement !== 'string' ||
+      typeof parsed.functionName !== 'string' ||
+      typeof parsed.referenceSolutionJS !== 'string' ||
+      !Array.isArray(parsed.testCases) ||
+      parsed.testCases.length === 0
+    ) {
+      throw new AIProviderError("Gemini's problem generation wasn't in the expected format — try again.");
+    }
+    return {
+      title: parsed.title,
+      statement: parsed.statement,
+      difficulty: typeof parsed.difficulty === 'string' ? parsed.difficulty : difficulty,
+      topics: Array.isArray(parsed.topics) ? parsed.topics.filter((t): t is string => typeof t === 'string') : [topic],
+      functionName: parsed.functionName,
+      testCases: parsed.testCases,
+      referenceSolutionJS: parsed.referenceSolutionJS,
+    };
   }
 }

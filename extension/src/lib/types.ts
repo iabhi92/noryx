@@ -107,6 +107,27 @@ export interface ReviewState {
   lastReviewedAt: number;
 }
 
+// AI-generated custom problems. args/expected are plain JSON values, positional to
+// referenceSolutionJS's parameter order — see lib/practiceVerify.ts for how testCases gets
+// trimmed down from what Gemini returns to only the ones actually verified against its own
+// reference solution.
+export interface PracticeTestCase {
+  args: unknown[];
+  expected: unknown;
+}
+
+export interface PracticeProblem {
+  title: string;
+  statement: string;
+  difficulty: string;
+  topics: string[];
+  functionName: string;
+  testCases: PracticeTestCase[];
+  referenceSolutionJS: string;
+  discardedCount: number;
+  generatedAt: number;
+}
+
 export function problemKey(platform: Platform, externalId: string): string {
   return `${platform}:${externalId}`;
 }
