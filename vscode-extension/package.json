@@ -1,0 +1,30 @@
+{
+  "name": "noryx-coach",
+  "displayName": "Noryx — AI Coding Coach",
+  "description": "Tracks active coding time in VS Code and, optionally, syncs it into the same public profile as the Noryx Safari extension.",
+  "version": "0.1.0",
+  "publisher": "noryx",
+  "private": true,
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": ["Other"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "noryx.setSyncCode", "title": "Noryx: Set Sync Code" },
+      { "command": "noryx.clearSyncCode", "title": "Noryx: Clear Sync Code" }
+    ]
+  },
+  "scripts": {
+    "build": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node18",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "@types/vscode": "^1.85.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  }
+}

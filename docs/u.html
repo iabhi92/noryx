@@ -106,12 +106,19 @@
         return;
       }
 
-      let profile;
-      try {
-        const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/public_profiles?id=eq.${encodeURIComponent(id)}&select=solved,streak,success_rate,platform_counts,topic_highlights,updated_at`,
+      const fetchProfile = (columns) =>
+        fetch(
+          `${SUPABASE_URL}/rest/v1/public_profiles?id=eq.${encodeURIComponent(id)}&select=${columns}`,
           { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } },
         );
+
+      let profile;
+      try {
+        // vscode_active_ms only exists once vscode_sync_migration.sql has been run — fall back to
+        // the columns that have always existed so a not-yet-migrated profile still loads instead
+        // of erroring on an unknown column.
+        let res = await fetchProfile('solved,streak,success_rate,platform_counts,topic_highlights,vscode_active_ms,updated_at');
+        if (!res.ok) res = await fetchProfile('solved,streak,success_rate,platform_counts,topic_highlights,updated_at');
         if (!res.ok) throw new Error(`${res.status}`);
         const rows = await res.json();
         profile = rows[0];
@@ -129,6 +136,9 @@
       const topicHighlights = profile.topic_highlights || {};
       const maxPlatform = Math.max(1, ...Object.values(platformCounts));
       const maxTopic = Math.max(1, ...Object.values(topicHighlights));
+      const vscodeMs = profile.vscode_active_ms || 0;
+      const vscodeHours = Math.floor(vscodeMs / 3600000);
+      const vscodeMinutes = Math.round((vscodeMs % 3600000) / 60000);
 
       root.innerHTML = `
         <div class="stat-grid">
@@ -148,6 +158,11 @@
             <div class="stat-label">🌐 Platforms</div>
             <div class="stat-value" style="font-size:20px">${Object.keys(platformCounts).length || '—'}</div>
           </div>
+          ${vscodeMs > 0 ? `
+          <div class="glass-card stat-tile">
+            <div class="stat-label">🖥️ VS Code Practice</div>
+            <div class="stat-value" style="font-size:24px">${vscodeHours > 0 ? `${vscodeHours}h ${vscodeMinutes}m` : `${vscodeMinutes}m`}</div>
+          </div>` : ''}
         </div>
         ${Object.keys(platformCounts).length ? `<div class="glass-card panel"><h3>🌐 Platform mix</h3>${barsFor(platformCounts, maxPlatform)}</div>` : ''}
         ${Object.keys(topicHighlights).length ? `<div class="glass-card panel"><h3>🧠 Topic strengths</h3>${barsFor(topicHighlights, maxTopic)}</div>` : ''}

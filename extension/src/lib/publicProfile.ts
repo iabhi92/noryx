@@ -23,6 +23,13 @@ export function shareUrlFor(id: string): string {
   return `https://iabhi92.github.io/noryx/u.html?id=${id}`;
 }
 
+/** One opaque string carrying {id, writeToken} for the VS Code extension's "Set Sync Code"
+ *  command — same identity as the public profile, so VS Code time lands on the same row. Base64
+ *  JSON rather than two UUIDs pasted side by side: one paste-able string, no field-order ambiguity. */
+export function syncCodeFor(id: string, writeToken: string): string {
+  return btoa(JSON.stringify({ id, writeToken }));
+}
+
 /** Turns on the public profile: creates the row, saves the id/write_token locally (the
  *  write_token never leaves this device again after this), and does an initial sync so the link
  *  isn't blank the moment it's shared. */

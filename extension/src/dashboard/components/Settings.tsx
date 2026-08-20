@@ -1,21 +1,24 @@
 import { useEffect, useState } from 'react';
 import { getSettings, saveSettings } from '../../lib/settings';
-import { enablePublicProfile, disablePublicProfile, shareUrlFor } from '../../lib/publicProfile';
+import { enablePublicProfile, disablePublicProfile, shareUrlFor, syncCodeFor } from '../../lib/publicProfile';
 
 export default function Settings() {
   const [keyInput, setKeyInput] = useState('');
   const [savedKey, setSavedKey] = useState<string | null>(null);
   const [cleared, setCleared] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [syncCode, setSyncCode] = useState<string | null>(null);
   const [profileBusy, setProfileBusy] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [syncCopied, setSyncCopied] = useState(false);
   const [captureCode, setCaptureCode] = useState(false);
 
   useEffect(() => {
     void getSettings().then((s) => {
       setSavedKey(s.geminiApiKey ?? null);
       setShareUrl(s.publicProfile ? shareUrlFor(s.publicProfile.id) : null);
+      setSyncCode(s.publicProfile ? syncCodeFor(s.publicProfile.id, s.publicProfile.writeToken) : null);
       setCaptureCode(!!s.captureCode);
     });
   }, []);
@@ -49,6 +52,8 @@ export default function Settings() {
     setProfileError(null);
     try {
       setShareUrl(await enablePublicProfile());
+      const s = await getSettings();
+      setSyncCode(s.publicProfile ? syncCodeFor(s.publicProfile.id, s.publicProfile.writeToken) : null);
     } catch (err) {
       setProfileError(err instanceof Error ? err.message : 'Something went wrong enabling the public profile.');
     } finally {
@@ -64,6 +69,7 @@ export default function Settings() {
     try {
       await disablePublicProfile();
       setShareUrl(null);
+      setSyncCode(null);
     } catch (err) {
       setProfileError(err instanceof Error ? err.message : 'Something went wrong disabling the public profile.');
     } finally {
@@ -76,6 +82,13 @@ export default function Settings() {
     void navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleCopySyncCode() {
+    if (!syncCode) return;
+    void navigator.clipboard.writeText(syncCode);
+    setSyncCopied(true);
+    setTimeout(() => setSyncCopied(false), 2000);
   }
 
   return (
@@ -139,6 +152,26 @@ export default function Settings() {
                 {copied ? '✅ Copied' : 'Copy'}
               </button>
             </div>
+            {syncCode && (
+              <div className="flex flex-col gap-xs border-t border-white/5 pt-xs mt-xs">
+                <p className="text-on-surface-variant text-xs">
+                  🖥️ Also coding in VS Code? Paste this into the{' '}
+                  <span className="text-on-surface">Noryx: Set Sync Code</span> command there to count that time
+                  toward this same profile — nothing else about your VS Code activity is ever read.
+                </p>
+                <div className="flex gap-xs flex-wrap items-center">
+                  <code className="flex-1 min-w-[200px] bg-surface-container border border-white/10 text-on-surface-variant rounded-lg px-sm py-xs text-sm truncate">
+                    {syncCode}
+                  </code>
+                  <button
+                    onClick={handleCopySyncCode}
+                    className="bg-surface-container border border-electric-blue/30 text-electric-blue font-label-sm rounded-lg px-sm py-xs text-sm"
+                  >
+                    {syncCopied ? '✅ Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            )}
             <button
               disabled={profileBusy}
               onClick={() => void handleDisableProfile()}
