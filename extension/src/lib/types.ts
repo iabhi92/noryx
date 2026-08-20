@@ -98,6 +98,15 @@ export interface StoredInterview {
   evaluation?: InterviewEvaluation;
 }
 
+// Spaced repetition (Leitner system): box advances on self-reported recall, resets to 0 on
+// "forgot". See REVIEW_INTERVAL_DAYS in storage.ts for the schedule.
+export interface ReviewState {
+  problemKey: string;
+  box: number;
+  dueAt: number;
+  lastReviewedAt: number;
+}
+
 export function problemKey(platform: Platform, externalId: string): string {
   return `${platform}:${externalId}`;
 }

@@ -11,6 +11,7 @@ import Settings from './components/Settings';
 import Sessions from './components/Sessions';
 import Analytics from './components/Analytics';
 import Roadmap from './components/Roadmap';
+import ReviewQueue from './components/ReviewQueue';
 import DailySummary from './components/DailySummary';
 import { Skeleton } from './components/Skeleton';
 
@@ -24,7 +25,9 @@ function rankFor(solved: number): string {
 
 
 export default function App() {
-  const [view, setView] = useState<'dashboard' | 'sessions' | 'analytics' | 'roadmap' | 'settings'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'sessions' | 'analytics' | 'roadmap' | 'review' | 'settings'>(
+    'dashboard',
+  );
   const [rows, setRows] = useState<ProblemRow[]>([]);
   const [stats, setStats] = useState({ solved: 0, activeTime: 0, successRate: 0, streak: 0 });
   const [loaded, setLoaded] = useState(false);
@@ -105,6 +108,8 @@ export default function App() {
           <Analytics />
         ) : view === 'roadmap' ? (
           <Roadmap onOpenSettings={() => setView('settings')} />
+        ) : view === 'review' ? (
+          <ReviewQueue />
         ) : (
           <>
             <DailySummary />

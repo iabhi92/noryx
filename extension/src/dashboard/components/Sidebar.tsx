@@ -1,8 +1,9 @@
-type View = 'dashboard' | 'sessions' | 'analytics' | 'roadmap' | 'settings';
+type View = 'dashboard' | 'sessions' | 'analytics' | 'roadmap' | 'review' | 'settings';
 
 const NAV_ITEMS: Array<{ icon: string; label: string; view: View | null }> = [
   { icon: 'dashboard', label: 'Dashboard', view: 'dashboard' },
   { icon: 'map', label: 'Roadmap', view: 'roadmap' },
+  { icon: 'history_edu', label: 'Review', view: 'review' },
   { icon: 'code_blocks', label: 'Sessions', view: 'sessions' },
   { icon: 'insights', label: 'Analytics', view: 'analytics' },
   { icon: 'settings', label: 'Settings', view: 'settings' },
