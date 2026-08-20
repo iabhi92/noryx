@@ -113,6 +113,11 @@ export default function Sessions() {
                   <span>⏱️ {formatDuration(session.activeMs)}</span>
                   <span>🔁 {session.attempts} attempt{session.attempts === 1 ? '' : 's'}</span>
                   {session.tabSwitches > 0 && <span>↔️ {session.tabSwitches} tab switches</span>}
+                  {session.pasteChars > 0 && (
+                    <span title="Large pastes into the editor — not what was pasted, just how much">
+                      📋 {session.pasteChars} chars pasted
+                    </span>
+                  )}
                   {hints.length > 0 && <span>💡 {hints.length} hint{hints.length === 1 ? '' : 's'}</span>}
                 </div>
               </div>

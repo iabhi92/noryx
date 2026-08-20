@@ -7,6 +7,9 @@ import type { Stoppable } from '../lib/adapters/dom-heuristics';
 import { mountOverlay } from './overlay';
 
 const HEARTBEAT_INTERVAL_MS = 15000;
+// Below this, a paste is more likely a variable name or a single line pulled from docs than a
+// chunk of solution code — not worth counting as a behavioral signal.
+const PASTE_NOISE_FLOOR_CHARS = 20;
 // ponytail: pushState-patch + popstate covers most SPA routers; the poll is a cheap fallback for
 // whatever navigation mechanism a given judge's frontend uses that we didn't intercept.
 const URL_POLL_INTERVAL_MS = 1000;
@@ -22,11 +25,25 @@ function isStoppable(adapter: CodingPlatformAdapter): adapter is CodingPlatformA
 function runHeartbeat(key: string): () => void {
   let lastTick = Date.now();
   let tabSwitches = 0;
+  let pasteCount = 0;
+  let pasteChars = 0;
 
   const onVisibilityChange = () => {
     if (document.hidden) tabSwitches += 1;
   };
   document.addEventListener('visibilitychange', onVisibilityChange);
+
+  // Capture phase on document, not a per-adapter editor hook: paste events bubble through Shadow
+  // DOM and iframe-free editors alike, so one listener covers Monaco/Ace/CodeMirror/textarea
+  // without needing to know which one is on the page. Length only — the pasted text itself is
+  // never read into a variable, let alone stored.
+  const onPaste = (e: ClipboardEvent) => {
+    const length = e.clipboardData?.getData('text').length ?? 0;
+    if (length < PASTE_NOISE_FLOOR_CHARS) return;
+    pasteCount += 1;
+    pasteChars += length;
+  };
+  document.addEventListener('paste', onPaste, true);
 
   const intervalId = setInterval(() => {
     const now = Date.now();
@@ -39,13 +56,18 @@ function runHeartbeat(key: string): () => void {
       activeDeltaMs: active ? delta : 0,
       idleDeltaMs: active ? 0 : delta,
       tabSwitchInc: tabSwitches,
+      pasteCountInc: pasteCount,
+      pasteCharsInc: pasteChars,
     });
     tabSwitches = 0;
+    pasteCount = 0;
+    pasteChars = 0;
   }, HEARTBEAT_INTERVAL_MS);
 
   return () => {
     clearInterval(intervalId);
     document.removeEventListener('visibilitychange', onVisibilityChange);
+    document.removeEventListener('paste', onPaste, true);
   };
 }
 

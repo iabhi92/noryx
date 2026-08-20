@@ -59,6 +59,8 @@ export async function getOrCreateSession(problemKey: string): Promise<CodingSess
     activeMs: 0,
     idleMs: 0,
     tabSwitches: 0,
+    pasteCount: 0,
+    pasteChars: 0,
     attempts: 0,
     hintLevel: 0,
   };
@@ -72,6 +74,8 @@ export async function applyHeartbeat(
   activeDeltaMs: number,
   idleDeltaMs: number,
   tabSwitchInc: number,
+  pasteCountInc = 0,
+  pasteCharsInc = 0,
 ): Promise<void> {
   const session = await getOrCreateSession(problemKey);
   const sessions = await getMap<CodingSession>(KEYS.sessions);
@@ -80,6 +84,8 @@ export async function applyHeartbeat(
     activeMs: session.activeMs + activeDeltaMs,
     idleMs: session.idleMs + idleDeltaMs,
     tabSwitches: session.tabSwitches + tabSwitchInc,
+    pasteCount: (session.pasteCount ?? 0) + pasteCountInc,
+    pasteChars: (session.pasteChars ?? 0) + pasteCharsInc,
     lastHeartbeatAt: Date.now(),
   };
   await setMap(KEYS.sessions, sessions);

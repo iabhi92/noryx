@@ -54,7 +54,14 @@ async function handleMessage(message: RuntimeMessage): Promise<void> {
       break;
     }
     case 'HEARTBEAT':
-      await applyHeartbeat(message.problemKey, message.activeDeltaMs, message.idleDeltaMs, message.tabSwitchInc);
+      await applyHeartbeat(
+        message.problemKey,
+        message.activeDeltaMs,
+        message.idleDeltaMs,
+        message.tabSwitchInc,
+        message.pasteCountInc,
+        message.pasteCharsInc,
+      );
       void maybeIntervene(message.problemKey);
       void maybeSyncPublicProfile();
       break;

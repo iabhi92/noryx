@@ -58,6 +58,11 @@ export interface CodingSession {
   activeMs: number;
   idleMs: number;
   tabSwitches: number;
+  // Count + total length of paste events into the editor above a noise threshold (see
+  // universal.ts) — never the pasted text itself. Same "ambient metadata, not content" tier as
+  // tabSwitches/activeMs: tracked by default, unlike EditorState.code which needs opt-in.
+  pasteCount: number;
+  pasteChars: number;
   attempts: number;
   hintLevel: number; // 0 = no hint yet; 1-4 = PRD's progressive levels reached so far
   lastHintAt?: number; // drives the intervention cooldown
