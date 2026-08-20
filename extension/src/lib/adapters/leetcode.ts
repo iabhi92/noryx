@@ -1,4 +1,4 @@
-import { findLeafByExactText, extractEditorCode, type Stoppable } from './dom-heuristics';
+import { findLeafByExactText, extractEditorCode, KNOWN_LANGUAGES, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -24,11 +24,8 @@ const STATUS_STRINGS: SubmissionStatus[] = [
 ];
 
 // ponytail: confirmed live that the button shows the plain language name ("Python"), not always
-// "Python3" — leaf-text match against this list, no stable locator found for the language picker.
-const KNOWN_LANGUAGES = [
-  'Python3', 'Python', 'C++', 'Java', 'JavaScript', 'TypeScript', 'C', 'C#',
-  'Go', 'Rust', 'Swift', 'Kotlin', 'Ruby', 'Scala', 'PHP', 'Dart', 'Racket', 'Erlang', 'Elixir',
-];
+// "Python3" — leaf-text match against KNOWN_LANGUAGES (dom-heuristics.ts), no stable locator
+// found for the language picker.
 
 function slugFromUrl(): string | null {
   const match = location.pathname.match(/\/problems\/([^/]+)\/?/);

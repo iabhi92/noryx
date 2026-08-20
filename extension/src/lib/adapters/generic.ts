@@ -1,4 +1,4 @@
-import { findLeafByExactText, extractEditorCode, SubmissionWatcher, type Stoppable } from './dom-heuristics';
+import { findLeafByExactText, extractEditorCode, KNOWN_LANGUAGES, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -18,12 +18,6 @@ import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, Submission
 
 const EDITOR_SELECTORS = ['.monaco-editor', '.CodeMirror', '.cm-editor', '.ace_editor', 'textarea'];
 const ACTION_BUTTON_TEXTS = ['run', 'submit', 'compile', 'execute', 'run code', 'submit code'];
-
-const KNOWN_LANGUAGES = [
-  'Python3', 'Python', 'Python 3', 'C++', 'Java', 'JavaScript', 'TypeScript', 'C', 'C#',
-  'Go', 'Rust', 'Swift', 'Kotlin', 'Ruby', 'Scala', 'PHP', 'Dart', 'Racket', 'Erlang', 'Elixir',
-  'Pascal', 'Perl', 'Haskell', 'D', 'OCaml', 'F#',
-];
 
 const CANONICAL_STATUSES: Array<{ pattern: RegExp; status: SubmissionStatus }> = [
   { pattern: /^accepted$/i, status: 'Accepted' },

@@ -17,6 +17,14 @@ export function findLeafByExactText(candidates: string[]): { text: string; el: E
   return findLeafMatching((text) => candidates.includes(text));
 }
 
+// Shared across adapters (was duplicated in leetcode.ts and generic.ts with generic.ts's list a
+// strict superset) and the in-page overlay's "Run locally" language check.
+export const KNOWN_LANGUAGES = [
+  'Python3', 'Python', 'Python 3', 'C++', 'Java', 'JavaScript', 'TypeScript', 'C', 'C#',
+  'Go', 'Rust', 'Swift', 'Kotlin', 'Ruby', 'Scala', 'PHP', 'Dart', 'Racket', 'Erlang', 'Elixir',
+  'Pascal', 'Perl', 'Haskell', 'D', 'OCaml', 'F#',
+];
+
 /** Best-effort code extraction from whichever editor widget is on the page. Only ever called
  *  when the user has opted in (settings.captureCode) — see EditorState.code. Monaco and Ace both
  *  virtualize rendering (only visible lines actually exist in the DOM, recycled as you scroll),

@@ -5,6 +5,8 @@ import { getSettings } from '../lib/settings';
 import { useCoach, type CoachTarget } from '../lib/hooks/useCoach';
 import { CircularTimer, RingBadge } from '../lib/CircularTimer';
 import { MAX_AUTO_HINT_LEVEL } from '../lib/ai/intervention';
+import { extractEditorCode, findLeafByExactText, KNOWN_LANGUAGES } from '../lib/adapters/dom-heuristics';
+import { runJavaScript, canRunLocally, type RunResult } from '../lib/codeRunner';
 import type { Problem, ProblemMetadata, StoredHint } from '../lib/types';
 
 // ponytail: pulling React+ReactDOM into the content script (vs. hand-rolled DOM) puts
@@ -49,6 +51,21 @@ const STYLES = `
     background: none; border: none; color: #c4c7c7; cursor: pointer; font-size: 16px; padding: 2px 6px;
   }
   .close-btn:hover { background: rgba(255,255,255,0.08); }
+  .run-btn {
+    background: none; border: none; color: #c4c7c7; cursor: pointer; font-size: 15px; padding: 2px 6px; flex-shrink: 0;
+  }
+  .run-btn:hover { color: #00f0ff; }
+  .run-btn:disabled { opacity: 0.5; cursor: default; }
+  .run-output { border-bottom: 1px solid rgba(255,255,255,0.06); max-height: 140px; display: flex; flex-direction: column; }
+  .run-output-header {
+    display: flex; align-items: center; justify-content: space-between; padding: 6px 12px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: #00f0ff; background: rgba(0,240,255,0.05);
+  }
+  .run-output-body {
+    margin: 0; padding: 8px 12px; font-size: 11.5px; line-height: 1.5; color: #e5e2e1;
+    white-space: pre-wrap; word-break: break-word; overflow-y: auto; max-height: 100px;
+  }
+  .run-output-error { color: #ffb4ab; }
   .chat { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; min-height: 120px; }
   .chat-block-agent { border-left: 2px solid rgba(0,240,255,0.4); padding-left: 10px; }
   .chat-block-user { border-right: 2px solid rgba(255,255,255,0.2); padding-right: 10px; text-align: right; }
@@ -104,6 +121,8 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
   const [active, setActive] = useState<CoachTarget | null>(null);
   const [hints, setHints] = useState<StoredHint[]>([]);
   const [now, setNow] = useState(Date.now());
+  const [runResult, setRunResult] = useState<RunResult | null>(null);
+  const [running, setRunning] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
@@ -140,6 +159,33 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
   const isLive = !!session?.lastHeartbeatAt && now - session.lastHeartbeatAt < 20000;
   const atMaxLevel = (session?.hintLevel ?? 0) >= MAX_AUTO_HINT_LEVEL;
 
+  // Reads the editor fresh at click-time (not stored submission code, which only exists if
+  // captureCode is on) — this never leaves the device, so it isn't gated by that setting at all.
+  // Only the dashboard's separate tab can't do this; the overlay lives on the same page as the
+  // editor, so it's the only place "run locally" is architecturally possible.
+  async function handleRunLocally() {
+    const code = extractEditorCode();
+    if (!code) {
+      setRunResult({ output: '', error: 'No code found in the editor.', ranAt: Date.now() });
+      return;
+    }
+    const detected = findLeafByExactText(KNOWN_LANGUAGES)?.text ?? '';
+    if (!canRunLocally(detected)) {
+      setRunResult({
+        output: '',
+        error: detected
+          ? `Local execution only supports JavaScript/TypeScript right now — detected ${detected}.`
+          : "Couldn't detect the language, and local execution only supports JavaScript/TypeScript right now.",
+        ranAt: Date.now(),
+      });
+      return;
+    }
+    setRunning(true);
+    setRunResult(null);
+    setRunResult(await runJavaScript(code));
+    setRunning(false);
+  }
+
   if (!expanded) {
     return (
       <div className="bubble-wrap">
@@ -157,11 +203,34 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
     <div className="panel">
       <div className="panel-header">
         <span className="panel-title"># {problem.title}</span>
+        <button
+          className="run-btn"
+          onClick={() => void handleRunLocally()}
+          disabled={running}
+          aria-label="Run code locally"
+          title="Run the current editor code locally (JavaScript/TypeScript only)"
+        >
+          {running ? '⏳' : '⚡'}
+        </button>
         <CircularTimer elapsedMs={session?.activeMs ?? 0} isLive={isLive} size={40} />
         <button className="close-btn" onClick={() => setExpanded(false)} aria-label="Collapse coach panel" title="Collapse">
           ✕
         </button>
       </div>
+
+      {runResult && (
+        <div className="run-output">
+          <div className="run-output-header">
+            <span>local_exec.out</span>
+            <button className="close-btn" onClick={() => setRunResult(null)} aria-label="Dismiss run output" title="Dismiss">
+              ✕
+            </button>
+          </div>
+          {runResult.output && <pre className="run-output-body">{runResult.output}</pre>}
+          {runResult.error && <pre className="run-output-body run-output-error">{runResult.error}</pre>}
+          {!runResult.output && !runResult.error && <pre className="run-output-body">(no output)</pre>}
+        </div>
+      )}
 
       {!apiKey ? (
         <div className="empty" style={{ padding: 12 }}>
