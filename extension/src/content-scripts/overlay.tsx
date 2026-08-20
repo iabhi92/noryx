@@ -15,70 +15,72 @@ import type { Problem, ProblemMetadata, StoredHint } from '../lib/types';
 // Hand-written CSS, not Tailwind — the dashboard's Tailwind build only exists for the dashboard
 // bundle (its own Vite pipeline); pulling that into a content script means either a second build
 // pipeline or loading the dashboard's hashed CSS file across bundles, neither of which is worth it
-// for a widget this size. Same color tokens as the dashboard (electric-blue #0ea5e9, soft-violet
-// #a78bfa, surface #0f1418) for visual consistency, injected into a Shadow DOM so the host page's
-// CSS can't bleed in and this widget's CSS can't bleed onto the host page.
+// for a widget this size. Same tokens as the dashboard's "Ultra Engineering Terminal" theme
+// (stitch_design_enhancement_engine/code.html: neon-cyan #00f0ff, neon-pink #f8acff, near-black
+// #131313), injected into a Shadow DOM so the host page's CSS can't bleed in and vice versa.
 const STYLES = `
   :host { all: initial; }
-  * { box-sizing: border-box; font-family: -apple-system, system-ui, sans-serif; }
+  * { box-sizing: border-box; font-family: 'Geist Mono', ui-monospace, monospace; }
   .bubble-wrap { position: fixed; bottom: 20px; right: 20px; z-index: 2147483000; }
   .bubble-btn {
     position: absolute; inset: 6px; border-radius: 999px;
-    background: linear-gradient(135deg, #0ea5e9, #a78bfa); border: none; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(14,165,233,0.4); font-size: 24px;
+    background: #131313; border: 1px solid rgba(0,240,255,0.4); cursor: pointer;
+    box-shadow: 0 0 16px rgba(0,240,255,0.3); font-size: 22px;
     display: flex; align-items: center; justify-content: center; transition: transform 0.15s;
   }
   .bubble-btn:hover { transform: scale(1.08); }
   .badge {
-    position: absolute; top: -2px; right: -2px; background: #ffb4ab; color: #690005;
+    position: absolute; top: -2px; right: -2px; background: #f8acff; color: #131313;
     font-size: 10px; font-weight: 700; min-width: 16px; height: 16px; border-radius: 999px;
     display: flex; align-items: center; justify-content: center; padding: 0 3px;
   }
   .panel {
     position: fixed; bottom: 20px; right: 20px; width: 340px; max-height: 480px;
-    background: #0f1418; border: 1px solid rgba(14,165,233,0.25); border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 2147483000; display: flex; flex-direction: column;
-    overflow: hidden; color: #dee3e9;
+    background: rgba(20,20,20,0.85); backdrop-filter: blur(24px); border: 1px solid rgba(0,240,255,0.2);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6); z-index: 2147483000; display: flex; flex-direction: column;
+    overflow: hidden; color: #e5e2e1;
   }
   .panel-header {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-  .panel-title { font-size: 13px; font-weight: 700; color: #dee3e9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .panel-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: #e5e2e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .close-btn {
-    background: none; border: none; color: #bec8d2; cursor: pointer; font-size: 16px; padding: 2px 6px; border-radius: 6px;
+    background: none; border: none; color: #c4c7c7; cursor: pointer; font-size: 16px; padding: 2px 6px;
   }
   .close-btn:hover { background: rgba(255,255,255,0.08); }
-  .chat { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 120px; }
-  .msg-row { display: flex; align-items: flex-end; gap: 6px; }
-  .msg-row.user { justify-content: flex-end; }
-  .msg-bubble {
-    max-width: 85%; padding: 8px 10px; border-radius: 14px; font-size: 12.5px; line-height: 1.45; white-space: pre-wrap;
-  }
-  .msg-bubble.ai { background: #1b2024; border-bottom-left-radius: 4px; }
-  .msg-bubble.user { background: linear-gradient(135deg, #0ea5e9, #a78bfa); color: #00344d; border-bottom-right-radius: 4px; }
-  .msg-level { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: #0ea5e9; margin-bottom: 3px; }
-  .empty { color: #bec8d2; font-size: 12.5px; padding: 4px; }
+  .chat { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 14px; min-height: 120px; }
+  .chat-block-agent { border-left: 2px solid rgba(0,240,255,0.4); padding-left: 10px; }
+  .chat-block-user { border-right: 2px solid rgba(255,255,255,0.2); padding-right: 10px; text-align: right; }
+  .msg-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; opacity: 0.8; }
+  .msg-label.agent { color: #00f0ff; }
+  .msg-label.user { color: #c4c7c7; }
+  .msg-text { font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; color: rgba(229,226,225,0.9); }
+  .empty { color: #c4c7c7; font-size: 12.5px; padding: 4px; }
   .composer {
-    display: flex; align-items: flex-end; gap: 6px; padding: 8px; border-top: 1px solid rgba(255,255,255,0.06);
+    position: relative; display: flex; align-items: center; gap: 6px; margin: 8px;
+    background: rgba(20,20,20,0.6); border: 1px solid rgba(255,255,255,0.1);
   }
+  .composer:focus-within { border-color: rgba(0,240,255,0.4); }
+  .composer .prompt { position: absolute; left: 10px; color: #00f0ff; font-size: 12px; font-weight: 700; opacity: 0.8; }
   .composer textarea {
-    flex: 1; background: #1b2024; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-    color: #dee3e9; font-size: 12.5px; padding: 8px 10px; resize: none; outline: none;
+    flex: 1; background: transparent; border: none;
+    color: #e5e2e1; font-size: 12.5px; padding: 10px 36px 10px 26px; resize: none; outline: none;
   }
-  .composer textarea:focus { border-color: rgba(14,165,233,0.6); }
   .send-btn {
-    width: 32px; height: 32px; border-radius: 999px; border: none; cursor: pointer;
-    background: linear-gradient(135deg, #0ea5e9, #a78bfa); color: #00344d; font-size: 14px;
+    position: absolute; right: 4px; width: 26px; height: 26px; border: none; cursor: pointer;
+    background: transparent; color: #c4c7c7; font-size: 14px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .send-btn:hover { color: #00f0ff; }
   .send-btn:disabled { opacity: 0.4; cursor: default; }
   .keybtn {
-    margin: 8px 10px 10px; background: linear-gradient(135deg, #0ea5e9, #a78bfa); border: none;
-    color: #00344d; font-weight: 700; font-size: 12px; border-radius: 10px; padding: 8px; cursor: pointer;
+    margin: 0 10px 10px; background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    color: #c4c7c7; font-weight: 500; font-size: 11px; text-transform: uppercase; padding: 8px; cursor: pointer;
   }
+  .keybtn:hover { color: #e5e2e1; border-color: rgba(255,255,255,0.3); }
   .dots { display: flex; gap: 3px; padding: 2px 4px; }
-  .dot { width: 5px; height: 5px; border-radius: 999px; background: rgba(190,200,210,0.6); animation: bounce 1s infinite; }
+  .dot { width: 5px; height: 5px; border-radius: 999px; background: rgba(0,240,255,0.6); animation: bounce 1s infinite; }
   .dot:nth-child(2) { animation-delay: 0.12s; }
   .dot:nth-child(3) { animation-delay: 0.24s; }
   @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
@@ -154,7 +156,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
   return (
     <div className="panel">
       <div className="panel-header">
-        <span className="panel-title">🤖 {problem.title}</span>
+        <span className="panel-title"># {problem.title}</span>
         <CircularTimer elapsedMs={session?.activeMs ?? 0} isLive={isLive} size={40} />
         <button className="close-btn" onClick={() => setExpanded(false)} aria-label="Collapse coach panel" title="Collapse">
           ✕
@@ -169,45 +171,44 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
         <>
           <div className="chat" ref={chatRef}>
             {hints.length === 0 && !busy && (
-              <div className="msg-row">
-                <div className="msg-bubble ai">Stuck, or want to talk through your approach? Ask below.</div>
+              <div className="chat-block-agent">
+                <span className="msg-label agent">coach.noryx // sys.msg</span>
+                <div className="msg-text">Stuck, or want to talk through your approach? Ask below.</div>
               </div>
             )}
             {hints.map((h) => (
-              <div key={h.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div key={h.id} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {h.userMessage && (
-                  <div className="msg-row user">
-                    <div className="msg-bubble user">{h.userMessage}</div>
+                  <div className="chat-block-user">
+                    <span className="msg-label user">usr.local // reply</span>
+                    <div className="msg-text">{h.userMessage}</div>
                   </div>
                 )}
-                <div className="msg-row">
-                  <div className="msg-bubble ai">
-                    <span className="msg-level">
-                      {h.level === 'solution' ? '🔓 solution' : `💡 level ${h.level}`}
-                      {h.auto ? ' · auto' : ''}
-                    </span>
-                    {h.text}
-                  </div>
+                <div className="chat-block-agent">
+                  <span className="msg-label agent">
+                    coach.noryx // {h.level === 'solution' ? 'solution' : `level ${h.level}`}
+                    {h.auto ? ' · auto' : ''}
+                  </span>
+                  <div className="msg-text">{h.text}</div>
                 </div>
               </div>
             ))}
             {busy && (
-              <div className="msg-row">
-                <div className="msg-bubble ai dots">
-                  <span className="dot" />
-                  <span className="dot" />
-                  <span className="dot" />
-                </div>
+              <div className="chat-block-agent dots">
+                <span className="dot" />
+                <span className="dot" />
+                <span className="dot" />
               </div>
             )}
           </div>
           {error && <div className="empty" style={{ color: '#ffb4ab' }}>{error}</div>}
           <div className="composer">
+            <span className="prompt">&gt;_</span>
             <textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={handleComposerKeyDown}
-              placeholder="What are you thinking?"
+              placeholder="execute command…"
               rows={1}
             />
             <button
@@ -221,7 +222,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
           </div>
           {atMaxLevel && (
             <button className="keybtn" disabled={busy} onClick={handleShowSolution}>
-              🔓 Show full solution
+              show full solution
             </button>
           )}
         </>

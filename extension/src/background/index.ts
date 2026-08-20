@@ -42,7 +42,7 @@ let unseenHints = 0;
 
 function updateBadge(): void {
   chrome.action.setBadgeText({ text: unseenHints > 0 ? String(unseenHints) : '' });
-  chrome.action.setBadgeBackgroundColor({ color: '#0ea5e9' });
+  chrome.action.setBadgeBackgroundColor({ color: '#00f0ff' });
 }
 
 async function handleMessage(message: RuntimeMessage): Promise<void> {

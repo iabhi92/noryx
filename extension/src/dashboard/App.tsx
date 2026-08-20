@@ -92,7 +92,7 @@ export default function App() {
             </h1>
             <p className="font-body-md text-on-surface-variant">Your coding sessions, tracked automatically.</p>
           </div>
-          <div className="bg-surface-elevated border border-electric-blue/30 rounded-full px-sm py-xs flex items-center gap-xs shadow-[0_0_10px_rgba(14,165,233,0.2)]">
+          <div className="bg-surface-elevated border border-electric-blue/30 rounded-full px-sm py-xs flex items-center gap-xs shadow-[0_0_10px_rgba(0,240,255,0.2)]">
             <span className="text-xl">🏆</span>
             <span className="font-label-sm text-label-sm text-electric-blue uppercase">{rankFor(stats.solved)}</span>
           </div>

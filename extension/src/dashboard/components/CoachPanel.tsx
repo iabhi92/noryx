@@ -65,17 +65,14 @@ const LEVEL_LABEL: Record<StoredHint['level'], string> = {
 
 function TypingBubble() {
   return (
-    <div className="flex items-end gap-2">
-      <span className="text-lg leading-none">🤖</span>
-      <div className="bg-surface-container rounded-2xl rounded-bl-sm px-sm py-xs flex gap-1 items-center">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="w-1.5 h-1.5 rounded-full bg-on-surface-variant/60 animate-bounce"
-            style={{ animationDelay: `${i * 120}ms` }}
-          />
-        ))}
-      </div>
+    <div className="chat-block-agent flex gap-1 items-center">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="w-1.5 h-1.5 rounded-full bg-electric-blue/60 animate-bounce"
+          style={{ animationDelay: `${i * 120}ms` }}
+        />
+      ))}
     </div>
   );
 }
@@ -176,14 +173,14 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
   if (!apiKey) {
     return (
       <div className="glass-card rounded-xl p-sm mb-md flex flex-col gap-xs">
-        <h3 className="font-headline-md text-body-lg font-bold text-on-surface">🔑 Connect Gemini to enable coaching</h3>
+        <h3 className="font-code-md text-sm uppercase tracking-wider text-on-surface">// connect_gemini</h3>
         <p className="text-on-surface-variant text-sm">
           Noryx nudges you with hints while you're stuck — it needs a free Gemini API key to do
           that. Add one in Settings.
         </p>
         <button
           onClick={onOpenSettings}
-          className="self-start bg-gradient-to-r from-electric-blue to-soft-violet text-on-primary font-label-sm rounded-lg px-sm py-xs text-sm"
+          className="self-start bg-transparent border border-electric-blue/30 text-electric-blue font-code-md text-xs py-2 px-4 uppercase hover:bg-electric-blue/10 hover:border-electric-blue/60 transition-all"
         >
           Open Settings
         </button>
@@ -193,8 +190,8 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
 
   if (!active) {
     return (
-      <div className="glass-card rounded-xl p-sm mb-md text-on-surface-variant text-sm">
-        🧑‍💻 Open a problem on LeetCode to get coached.
+      <div className="glass-card rounded-xl p-sm mb-md text-on-surface-variant text-sm font-code-md">
+        // open a problem on LeetCode to get coached
       </div>
     );
   }
@@ -207,80 +204,84 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
 
   return (
     <div className="glass-card rounded-xl p-sm mb-md flex flex-col gap-sm">
-      <div className="flex items-center justify-between gap-sm flex-wrap">
+      <div className="flex items-center justify-between gap-sm flex-wrap border-b border-white/5 pb-sm">
         <div className="flex flex-col gap-0.5">
-          <h3 className="font-headline-md text-body-lg font-bold text-on-surface flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-electric-blue to-soft-violet text-base">
-              🤖
-            </span>
-            Noryx Coach — {active.problem.title}
+          <h3 className="font-code-md text-lg text-on-surface tracking-tight uppercase flex items-center gap-2">
+            <span className="text-electric-blue opacity-70">#</span> {active.problem.title}
           </h3>
-          <span className="text-on-surface-variant text-xs pl-9">{isLive ? '🟢 on LeetCode' : '⚪ away'}</span>
+          <span className="font-code-md text-on-surface-variant text-[10px] uppercase tracking-widest">
+            {isLive ? (
+              <span className="text-neon-green flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" /> on leetcode
+              </span>
+            ) : (
+              'away'
+            )}
+          </span>
         </div>
         <CircularTimer elapsedMs={elapsed} isLive={isLive} size={64} />
       </div>
 
       {postSolveInsight && (
-        <div className="bg-gradient-to-r from-electric-blue/15 to-soft-violet/15 border border-electric-blue/30 rounded-lg px-sm py-xs text-sm text-on-surface flex items-center gap-2">
-          <span className="text-base">🏆</span>
+        <div className="border border-electric-blue/20 bg-white/5 rounded px-sm py-xs text-sm text-on-surface font-code-md">
           {postSolveInsight}
         </div>
       )}
 
-      <div ref={scrollRef} className="flex flex-col gap-sm max-h-80 overflow-y-auto scroll-smooth px-1">
+      <div ref={scrollRef} className="flex flex-col gap-6 max-h-80 overflow-y-auto scroll-smooth pr-1 font-code-md text-sm">
         {hints.length === 0 && !busy && (
-          <div className="flex items-end gap-2">
-            <span className="text-lg leading-none">🤖</span>
-            <div className="bg-surface-container rounded-2xl rounded-bl-sm px-sm py-xs text-on-surface-variant text-sm max-w-[85%]">
-              Stuck, or just want to talk through your approach? Ask me anything below — I won't
-              write the solution unless you tell me to.
+          <div className="chat-block-agent">
+            <div className="text-[10px] text-electric-blue mb-1 uppercase tracking-wider opacity-80">
+              coach.noryx // sys.msg
             </div>
+            <p className="text-on-surface/90 leading-relaxed">
+              Stuck, or just want to talk through your approach? Ask below — I won't write the
+              solution unless you tell me to.
+            </p>
           </div>
         )}
         {hints.map((h) => (
-          <div key={h.id} className="flex flex-col gap-1.5">
+          <div key={h.id}>
             {h.userMessage && (
-              <div className="flex justify-end">
-                <div className="bg-gradient-to-br from-electric-blue to-soft-violet text-on-primary rounded-2xl rounded-br-sm px-sm py-xs text-sm max-w-[85%] whitespace-pre-wrap">
-                  {h.userMessage}
+              <div className="chat-block-user">
+                <div className="text-[10px] text-on-surface-variant mb-1 uppercase tracking-wider opacity-80">
+                  usr.local // reply
                 </div>
+                <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{h.userMessage}</p>
               </div>
             )}
-            <div className="flex items-end gap-2">
-              <span className="text-lg leading-none shrink-0">🤖</span>
-              <div className="bg-surface-container rounded-2xl rounded-bl-sm px-sm py-xs max-w-[85%] flex flex-col gap-1">
-                <span className="font-label-sm text-electric-blue text-[10px] uppercase tracking-wide">
-                  {h.level === 'solution' ? '🔓 ' : '💡 '}
-                  {LEVEL_LABEL[h.level]}
-                  {h.auto ? ' · proactive' : ''}
-                </span>
-                <p className="text-on-surface text-sm whitespace-pre-wrap">{h.text}</p>
+            <div className="chat-block-agent">
+              <div className="text-[10px] text-electric-blue mb-1 uppercase tracking-wider opacity-80">
+                coach.noryx // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
+                {h.auto ? ' · auto' : ''}
               </div>
+              <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{h.text}</p>
             </div>
           </div>
         ))}
         {busy && <TypingBubble />}
       </div>
 
-      {error && <p className="text-error text-sm">{error}</p>}
+      {error && <p className="text-error text-sm font-code-md">{error}</p>}
 
-      <div className="flex items-end gap-xs bg-surface-container border border-white/10 rounded-2xl px-sm py-xs focus-within:border-electric-blue/60 transition-colors">
+      <div className="relative flex items-center glass-card border border-white/10 rounded focus-within:border-electric-blue/40 transition-colors">
+        <span className="absolute left-4 text-electric-blue font-code-md text-sm font-bold opacity-80">&gt;_</span>
         <textarea
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           onKeyDown={handleComposerKeyDown}
-          placeholder="Tell Noryx what you're thinking…"
+          placeholder="execute command…"
           rows={1}
-          className="flex-1 bg-transparent text-on-surface text-sm outline-none resize-none py-1 placeholder:text-on-surface-variant/60"
+          className="w-full bg-transparent border-none py-3 pl-12 pr-12 text-on-surface font-code-md text-sm outline-none resize-none placeholder:text-on-surface-variant/40"
         />
         <button
           disabled={busy}
           onClick={() => void requestHint(nextLevel)}
           aria-label={atMaxLevel ? 'Ask again' : `Ask for a hint (level ${nextLevel})`}
           title={atMaxLevel ? 'Ask again' : `Ask for a hint (level ${nextLevel})`}
-          className="shrink-0 w-9 h-9 rounded-full bg-gradient-to-br from-electric-blue to-soft-violet text-on-primary flex items-center justify-center disabled:opacity-40 hover:scale-105 active:scale-95 transition-transform"
+          className="absolute right-3 p-2 text-on-surface-variant hover:text-electric-blue transition-colors disabled:opacity-40"
         >
-          {busy ? '⏳' : '➤'}
+          <span className="material-symbols-outlined text-[20px]">{busy ? 'hourglass_top' : 'send'}</span>
         </button>
       </div>
 
@@ -288,9 +289,9 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
         <button
           disabled={busy}
           onClick={handleShowSolution}
-          className="self-start bg-surface-container border border-white/10 text-on-surface-variant font-label-sm rounded-lg px-sm py-xs text-sm disabled:opacity-50 hover:text-on-surface transition-all"
+          className="self-start bg-transparent border border-white/10 text-on-surface-variant font-code-md text-xs py-2 px-4 uppercase disabled:opacity-50 hover:text-on-surface hover:border-white/30 transition-all"
         >
-          🔓 Show full solution
+          show full solution
         </button>
       )}
     </div>

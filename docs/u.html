@@ -11,22 +11,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --background: #0f1418;
-    --sapphire-deep: #051424;
-    --surface-container: #1b2024;
+    --background: #131313;
+    --sapphire-deep: #0a0a0a;
+    --surface-container: #202020;
     --surface-container-highest: #30353a;
-    --on-surface: #dee3e9;
-    --on-surface-variant: #bec8d2;
-    --electric-blue: #0ea5e9;
-    --soft-violet: #a78bfa;
+    --on-surface: #e5e2e1;
+    --on-surface-variant: #c4c7c7;
+    --electric-blue: #00f0ff;
+    --soft-violet: #f8acff;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0; min-height: 100vh;
     background: var(--background);
     background-image:
-      radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.10) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.10) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.10) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(248, 172, 255, 0.10) 0px, transparent 50%);
     color: var(--on-surface);
     font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
   }
@@ -37,10 +37,10 @@
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
   .glass-card {
-    background: rgba(5, 20, 36, 0.7);
+    background: rgba(20, 20, 20, 0.7);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(14, 165, 233, 0.2);
-    box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
     border-radius: 1rem;
   }
   h1 { font-size: 28px; font-weight: 700; margin: 0 0 6px; }
@@ -53,7 +53,7 @@
   }
   .stat-value {
     font-size: 32px; font-weight: 700; color: var(--electric-blue);
-    filter: drop-shadow(0 0 10px rgba(14,165,233,0.4));
+    filter: drop-shadow(0 0 10px rgba(0,240,255,0.4));
   }
   .panel { padding: 20px; margin-bottom: 16px; }
   .panel h3 { font-size: 15px; margin: 0 0 14px; }
@@ -61,7 +61,7 @@
   .bar-row:last-child { margin-bottom: 0; }
   .bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--on-surface-variant); margin-bottom: 4px; text-transform: capitalize; }
   .bar-track { width: 100%; height: 8px; background: var(--surface-container-highest); border-radius: 999px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(to right, var(--electric-blue), var(--soft-violet)); box-shadow: 0 0 8px rgba(14,165,233,0.6); }
+  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(to right, var(--electric-blue), var(--soft-violet)); box-shadow: 0 0 8px rgba(0,240,255,0.6); }
   .empty, .error, .loading { text-align: center; color: var(--on-surface-variant); padding: 48px 0; }
   footer { text-align: center; margin-top: 32px; font-size: 13px; color: var(--on-surface-variant); }
   footer a { color: var(--electric-blue); text-decoration: none; }

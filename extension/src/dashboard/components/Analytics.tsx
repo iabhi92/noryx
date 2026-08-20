@@ -6,17 +6,17 @@ import { Skeleton } from './Skeleton';
 import type { StoredSubmission } from '../../lib/types';
 
 // Validated categorical palette (dataviz skill, dark-mode slots 1-5) — passes lightness band,
-// chroma floor, CVD separation (worst adjacent ΔE 8.4), and contrast vs this app's #0f1418
+// chroma floor, CVD separation (worst adjacent ΔE 8.4), and contrast vs a near-black (#131313)
 // surface. Fixed order, never cycled; a 6th+ platform folds into the gray "Other" bucket instead
 // of extending the ramp.
 const CATEGORICAL = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181'];
 const OTHER_COLOR = '#5b6570';
 
 // Reuses the same two-tone status convention already established in ProblemsTable/StatusBadge —
-// electric-blue for Accepted, error red for every failure kind, muted for in-progress. Status
-// colors are reserved and never repurposed as a generic categorical slot.
+// electric-blue (now neon-cyan) for Accepted, error red for every failure kind, muted for
+// in-progress. Status colors are reserved and never repurposed as a generic categorical slot.
 const STATUS_COLOR: Record<string, string> = {
-  Accepted: '#0ea5e9',
+  Accepted: '#00f0ff',
   'Wrong Answer': '#ffb4ab',
   'Time Limit Exceeded': '#ffb4ab',
   'Runtime Error': '#ffb4ab',
@@ -98,8 +98,8 @@ function ActivityChart({ counts }: { counts: { day: string; label: string; value
             className="w-full rounded-t-[4px] transition-all duration-150"
             style={{
               height: `${Math.max(4, (c.value / max) * 100)}%`,
-              backgroundColor: '#0ea5e9',
-              boxShadow: c.value > 0 ? '0 0 8px rgba(14,165,233,0.6)' : undefined,
+              backgroundColor: '#00f0ff',
+              boxShadow: c.value > 0 ? '0 0 8px rgba(0,240,255,0.6)' : undefined,
               opacity: c.value === 0 ? 0.15 : hovered === null || hovered === i ? 1 : 0.55,
             }}
           />
@@ -223,7 +223,7 @@ export default function Analytics() {
             {topicStats.map((t, i) => {
               const firstAttemptRate = t.attempted ? Math.round((t.firstAttemptSuccesses / t.attempted) * 100) : 0;
               const avgTime = t.solved ? t.totalSolvedActiveMs / t.solved : 0;
-              const color = i % 2 === 0 ? '#0ea5e9' : '#a78bfa';
+              const color = i % 2 === 0 ? '#00f0ff' : '#f8acff';
               return (
                 <div key={t.topic}>
                   <div className="flex justify-between items-baseline font-label-sm text-on-surface-variant text-xs mb-1">

@@ -2,30 +2,54 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ultra Engineering Terminal (stitch_design_enhancement_engine/code.html) */
 .mesh-bg {
+  background-color: #080808;
   background-image:
-    radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.1) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(167, 139, 250, 0.1) 0px, transparent 50%);
+    radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(248, 172, 255, 0.03) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+.tech-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 .glass-card {
-  background-color: rgba(5, 20, 36, 0.7);
+  background: rgba(20, 20, 20, 0.4);
   backdrop-filter: blur(24px);
-  border: 1px solid rgba(14, 165, 233, 0.2);
-  box-shadow: 0 0 15px rgba(14, 165, 233, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 .glass-card:hover {
-  border-color: rgba(14, 165, 233, 0.4);
-  box-shadow: 0 0 24px rgba(14, 165, 233, 0.18);
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
 }
 .glow-bar {
   box-shadow: 0 0 8px currentColor;
 }
 .text-gradient {
-  background: linear-gradient(to right, #0ea5e9, #a78bfa);
+  background: linear-gradient(to right, #00f0ff, #f8acff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+.neon-text-glow {
+  text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+}
+.chat-block-agent {
+  border-left: 2px solid rgba(0, 240, 255, 0.4);
+  padding-left: 1rem;
+}
+.chat-block-user {
+  border-right: 2px solid rgba(255, 255, 255, 0.2);
+  padding-right: 1rem;
+  text-align: right;
+}
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.3); }
 body {
   font-family: 'Geist', sans-serif;
 }

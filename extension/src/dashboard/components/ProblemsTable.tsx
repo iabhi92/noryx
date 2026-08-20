@@ -47,7 +47,7 @@ export default function ProblemsTable({ rows }: { rows: ProblemRow[] }) {
   if (rows.length === 0) {
     return (
       <div className="glass-card rounded-xl p-lg text-center text-on-surface-variant flex flex-col items-center gap-2">
-        <span className="text-6xl drop-shadow-[0_0_15px_rgba(14,165,233,0.6)]">🧭</span>
+        <span className="text-6xl drop-shadow-[0_0_15px_rgba(0,240,255,0.6)]">🧭</span>
         <p>No sessions tracked yet. Open a LeetCode problem to get started.</p>
       </div>
     );

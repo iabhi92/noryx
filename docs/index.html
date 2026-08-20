@@ -11,16 +11,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --background: #0f1418;
-    --sapphire-deep: #051424;
-    --surface-container: #1b2024;
-    --surface-container-low: #171c20;
-    --surface-elevated: #0d1e33;
-    --on-surface: #dee3e9;
-    --on-surface-variant: #bec8d2;
-    --electric-blue: #0ea5e9;
-    --soft-violet: #a78bfa;
-    --outline-variant: #3e4850;
+    --background: #131313;
+    --sapphire-deep: #0a0a0a;
+    --surface-container: #202020;
+    --surface-container-low: #1b1b1c;
+    --surface-elevated: #242424;
+    --on-surface: #e5e2e1;
+    --on-surface-variant: #c4c7c7;
+    --electric-blue: #00f0ff;
+    --soft-violet: #f8acff;
+    --outline-variant: #444748;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -28,8 +28,8 @@
     margin: 0;
     background: var(--background);
     background-image:
-      radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.10) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(167, 139, 250, 0.08) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.10) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(248, 172, 255, 0.08) 0px, transparent 50%);
     color: var(--on-surface);
     font-family: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
     line-height: 1.6;
@@ -44,15 +44,15 @@
     background-clip: text;
   }
   .glass-card {
-    background: rgba(5, 20, 36, 0.6);
+    background: rgba(20, 20, 20, 0.6);
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(14, 165, 233, 0.18);
+    border: 1px solid rgba(0, 240, 255, 0.18);
     border-radius: 1rem;
   }
 
   nav {
     position: sticky; top: 0; z-index: 10;
-    background: rgba(5, 20, 36, 0.75);
+    background: rgba(20, 20, 20, 0.75);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
@@ -71,7 +71,7 @@
     background: linear-gradient(to right, var(--electric-blue), var(--soft-violet));
     color: #00344d;
   }
-  .btn-primary:hover { box-shadow: 0 0 20px rgba(14,165,233,0.4); }
+  .btn-primary:hover { box-shadow: 0 0 20px rgba(0,240,255,0.4); }
   .btn-ghost {
     border-color: var(--outline-variant); color: var(--on-surface);
   }
@@ -80,7 +80,7 @@
   header.hero { padding: 96px 0 64px; text-align: center; }
   .eyebrow {
     display: inline-block; padding: 6px 14px; border-radius: 999px;
-    background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.3);
+    background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3);
     color: var(--electric-blue); font-size: 12px; font-family: 'JetBrains Mono', monospace;
     letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 28px;
   }
@@ -104,7 +104,7 @@
   .step .n {
     width: 32px; height: 32px; border-radius: 999px; margin: 0 auto 14px;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.35);
+    background: rgba(0,240,255,0.12); border: 1px solid rgba(0,240,255,0.35);
     color: var(--electric-blue); font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600;
   }
   .step p { font-size: 13.5px; color: var(--on-surface-variant); margin: 0; }
@@ -118,7 +118,7 @@
   }
   .shot .caption span.name { font-size: 14px; font-weight: 600; }
   .badge { font-size: 10px; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; }
-  .badge-live { background: rgba(14,165,233,0.15); color: var(--electric-blue); border: 1px solid rgba(14,165,233,0.35); }
+  .badge-live { background: rgba(0,240,255,0.15); color: var(--electric-blue); border: 1px solid rgba(0,240,255,0.35); }
   .badge-soon { background: rgba(255,255,255,0.05); color: var(--on-surface-variant); border: 1px solid var(--outline-variant); }
 
   .platforms { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
@@ -126,7 +126,7 @@
     padding: 9px 16px; border-radius: 999px; font-size: 13.5px;
     border: 1px solid var(--outline-variant); color: var(--on-surface-variant);
   }
-  .platform-chip.strong { border-color: rgba(14,165,233,0.4); color: var(--electric-blue); }
+  .platform-chip.strong { border-color: rgba(0,240,255,0.4); color: var(--electric-blue); }
   .platform-note { text-align: center; font-size: 13px; color: var(--on-surface-variant); opacity: 0.75; margin-top: 20px; }
 
   .privacy-card { padding: 40px; display: grid; grid-template-columns: auto 1fr; gap: 24px; align-items: center; }

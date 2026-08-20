@@ -4,7 +4,7 @@ export default function StatTile({ label, value, icon }: { label: string; value:
       <span className="font-label-sm text-on-surface-variant uppercase tracking-wide text-xs flex items-center gap-1">
         {icon && <span>{icon}</span>} {label}
       </span>
-      <span className="font-display text-headline-lg text-electric-blue drop-shadow-[0_0_10px_rgba(14,165,233,0.4)]">
+      <span className="font-display text-headline-lg text-electric-blue drop-shadow-[0_0_10px_rgba(0,240,255,0.4)]">
         {value}
       </span>
     </div>
