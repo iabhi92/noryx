@@ -12,6 +12,7 @@ import { formatElapsed } from '../../lib/format';
 import { CircularTimer } from '../../lib/CircularTimer';
 import { MAX_AUTO_HINT_LEVEL } from '../../lib/ai/intervention';
 import { Skeleton } from './Skeleton';
+import InterviewPanel from './InterviewPanel';
 import type { CodingSession, StoredProblem, StoredSubmission, StoredHint } from '../../lib/types';
 
 const JUST_SOLVED_WINDOW_MS = 5 * 60 * 1000;
@@ -88,6 +89,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
   const [hints, setHints] = useState<StoredHint[]>([]);
   const [now, setNow] = useState(Date.now());
   const [postSolveInsight, setPostSolveInsight] = useState<string | null>(null);
+  const [interviewMode, setInterviewMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
@@ -196,6 +198,10 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
     );
   }
 
+  if (interviewMode) {
+    return <InterviewPanel apiKey={apiKey} active={active} onExit={() => setInterviewMode(false)} />;
+  }
+
   const atMaxLevel = active.session.hintLevel >= MAX_AUTO_HINT_LEVEL;
   // activeMs only counts time the LeetCode tab was actually focused and visible (see the
   // content script's heartbeat) — this is "time on the problem", not wall-clock since open.
@@ -219,7 +225,16 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
             )}
           </span>
         </div>
-        <CircularTimer elapsedMs={elapsed} isLive={isLive} size={64} />
+        <div className="flex items-center gap-sm">
+          <button
+            onClick={() => setInterviewMode(true)}
+            title="Start a mock interview for this problem"
+            className="font-code-md text-[10px] uppercase tracking-wide text-on-surface-variant border border-white/10 px-2 py-1 hover:text-electric-blue hover:border-electric-blue/40 transition-all"
+          >
+            🎤 mock interview
+          </button>
+          <CircularTimer elapsedMs={elapsed} isLive={isLive} size={64} />
+        </div>
       </div>
 
       {postSolveInsight && (

@@ -1,4 +1,4 @@
-import type { Problem, ProblemMetadata, CodingSession, StoredSubmission, HintLevel } from '../types';
+import type { Problem, ProblemMetadata, CodingSession, StoredSubmission, HintLevel, InterviewTurn } from '../types';
 
 // Shape TBD — analyzeSession belongs to personal memory (PRD §10-11) and analyzeSolution to
 // post-solve analytics (§12), neither built yet. Declared as `unknown` so AIProvider's shape
@@ -39,6 +39,13 @@ export interface HintContext {
 export interface Hint {
   level: HintLevel | 'solution';
   text: string;
+}
+
+export interface InterviewContext {
+  problem: Problem & ProblemMetadata;
+  turns: InterviewTurn[];
+  submissions: StoredSubmission[];
+  elapsedMs: number;
 }
 
 /** Per the PRD: keep the AI layer provider-agnostic. Only `generateHint` has a caller today —

@@ -1,5 +1,6 @@
-import type { HintProvider, HintContext, Hint, ProgressContext, ProgressInsight } from './types';
+import type { HintProvider, HintContext, Hint, ProgressContext, ProgressInsight, InterviewContext } from './types';
 import { AIProviderError } from './types';
+import type { InterviewEvaluation } from '../types';
 
 // Gemini Flash-Lite class model per the PRD's "free-tier access" requirement. Verified live
 // against the real API (2026-08-20) — gemini-2.0-flash-lite has since been retired; Google's own
@@ -75,6 +76,68 @@ function buildRoadmapPrompt(context: ProgressContext): string {
   ].join('\n');
 }
 
+const INTERVIEWER_ROLE =
+  'You are Noryx, roleplaying as a friendly-but-real technical interviewer. Never write or fix ' +
+  "code, never reveal the algorithm outright — a real interviewer wouldn't. Keep every message " +
+  'short (2-3 sentences max) and conversational, like real interview dialogue.';
+
+function buildInterviewOpenerPrompt(problem: InterviewContext['problem']): string {
+  return [
+    INTERVIEWER_ROLE,
+    '',
+    `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
+    problem.topics?.length ? `Topics: ${problem.topics.join(', ')}` : null,
+    '',
+    'This is the opening of the interview. Greet the candidate briefly, then ask ONE genuine',
+    'clarifying question a real interviewer would ask about this problem (e.g. input constraints,',
+    'edge cases, expected behavior) — not a hint toward the solution.',
+  ]
+    .filter((line): line is string => line !== null)
+    .join('\n');
+}
+
+function buildInterviewContinuePrompt(context: InterviewContext): string {
+  const { problem, turns, submissions } = context;
+  const transcript = turns.map((t) => `${t.role}: ${t.text}`).join('\n');
+  const history = submissions.length
+    ? submissions.map((s, i) => `  ${i + 1}. ${s.status}`).join('\n')
+    : '  (no submissions yet)';
+
+  return [
+    INTERVIEWER_ROLE,
+    '',
+    `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
+    `Submissions so far:\n${history}`,
+    '',
+    `Transcript so far:\n${transcript}`,
+    '',
+    "Respond to the candidate's last message as the interviewer would: ask a probing follow-up",
+    '(about complexity, edge cases, or their reasoning), or a brief acknowledgment plus the next',
+    "clarifying question if they haven't started explaining an approach yet. Never give away the",
+    'pattern or algorithm.',
+  ].join('\n');
+}
+
+function buildInterviewEvalPrompt(context: InterviewContext): string {
+  const { problem, turns, submissions, elapsedMs } = context;
+  const transcript = turns.map((t) => `${t.role}: ${t.text}`).join('\n') || '(no dialogue)';
+  const minutes = Math.round(elapsedMs / 60000);
+  const solved = submissions.some((s) => s.status === 'Accepted');
+
+  return [
+    'You are Noryx, evaluating a completed mock technical interview. Score honestly based only on',
+    'the transcript and outcome below — never invent details not present here.',
+    '',
+    `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
+    `Time spent: ${minutes} minutes`,
+    `Solved: ${solved ? 'yes' : 'no'}`,
+    `Transcript:\n${transcript}`,
+    '',
+    'Respond with ONLY a JSON object, no markdown fences, no other text, in exactly this shape:',
+    '{"communication": <1-5 int>, "problemSolving": <1-5 int>, "complexityAwareness": <1-5 int>, "summary": "<2-3 sentence honest summary>"}',
+  ].join('\n');
+}
+
 interface GeminiResponse {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 }
@@ -82,7 +145,7 @@ interface GeminiResponse {
 export class GeminiProvider implements HintProvider {
   constructor(private apiKey: string) {}
 
-  private async callGemini(prompt: string): Promise<string> {
+  private async callGemini(prompt: string, jsonMode = false): Promise<string> {
     const url = `${API_BASE}/${MODEL}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
 
     let response: Response;
@@ -90,7 +153,10 @@ export class GeminiProvider implements HintProvider {
       response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          ...(jsonMode ? { generationConfig: { responseMimeType: 'application/json' } } : {}),
+        }),
       });
     } catch {
       throw new AIProviderError("Couldn't reach Gemini — check your internet connection.");
@@ -122,5 +188,31 @@ export class GeminiProvider implements HintProvider {
   async analyzeProgress(context: ProgressContext): Promise<ProgressInsight> {
     const text = await this.callGemini(buildRoadmapPrompt(context));
     return { text, generatedAt: Date.now() };
+  }
+
+  async startInterview(problem: InterviewContext['problem']): Promise<string> {
+    return this.callGemini(buildInterviewOpenerPrompt(problem));
+  }
+
+  async continueInterview(context: InterviewContext): Promise<string> {
+    return this.callGemini(buildInterviewContinuePrompt(context));
+  }
+
+  async evaluateInterview(context: InterviewContext): Promise<InterviewEvaluation> {
+    const raw = await this.callGemini(buildInterviewEvalPrompt(context), true);
+    try {
+      const parsed = JSON.parse(raw) as Partial<InterviewEvaluation>;
+      const clamp = (n: unknown) => Math.min(5, Math.max(1, Math.round(Number(n) || 3)));
+      return {
+        communication: clamp(parsed.communication),
+        problemSolving: clamp(parsed.problemSolving),
+        complexityAwareness: clamp(parsed.complexityAwareness),
+        summary: typeof parsed.summary === 'string' && parsed.summary ? parsed.summary : 'No summary returned.',
+      };
+    } catch {
+      // Conservative-by-design, same as maybeIntervene: a malformed response shouldn't crash the
+      // flow, just degrade to an honest "couldn't score this" rather than fabricated numbers.
+      throw new AIProviderError("Gemini's evaluation wasn't in the expected format — try again.");
+    }
   }
 }

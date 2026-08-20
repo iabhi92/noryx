@@ -76,6 +76,28 @@ export interface StoredHint {
   userMessage?: string; // what the user typed, if this hint was a reply to a free-text question
 }
 
+// Mock interview mode: a deliberately different interaction shape from hints (the AI leads,
+// asking clarifying questions unprompted, then scores the session) — doesn't reuse HintLevel at
+// all, this isn't a coaching level progression.
+export interface InterviewTurn {
+  role: 'interviewer' | 'candidate';
+  text: string;
+  at: number;
+}
+
+export interface InterviewEvaluation {
+  communication: number; // 1-5
+  problemSolving: number; // 1-5
+  complexityAwareness: number; // 1-5
+  summary: string;
+}
+
+export interface StoredInterview {
+  sessionId: string;
+  turns: InterviewTurn[];
+  evaluation?: InterviewEvaluation;
+}
+
 export function problemKey(platform: Platform, externalId: string): string {
   return `${platform}:${externalId}`;
 }

@@ -7,6 +7,9 @@ import type {
   SubmissionEvent,
   StoredHint,
   HintLevel,
+  InterviewTurn,
+  InterviewEvaluation,
+  StoredInterview,
 } from './types';
 import type { ProgressInsight } from './ai/types';
 
@@ -16,6 +19,7 @@ const KEYS = {
   submissions: 'noryx:submissions',
   hints: 'noryx:hints',
   roadmap: 'noryx:roadmap',
+  interviews: 'noryx:interviews',
 } as const;
 
 async function getMap<T>(key: string): Promise<Record<string, T>> {
@@ -132,6 +136,27 @@ export async function getRoadmap(): Promise<ProgressInsight | null> {
 
 export async function saveRoadmap(insight: ProgressInsight): Promise<void> {
   await chrome.storage.local.set({ [KEYS.roadmap]: insight });
+}
+
+export async function getInterview(sessionId: string): Promise<StoredInterview | null> {
+  const interviews = await getMap<StoredInterview>(KEYS.interviews);
+  return interviews[sessionId] ?? null;
+}
+
+export async function appendInterviewTurn(sessionId: string, turn: InterviewTurn): Promise<StoredInterview> {
+  const interviews = await getMap<StoredInterview>(KEYS.interviews);
+  const current = interviews[sessionId] ?? { sessionId, turns: [] };
+  const updated: StoredInterview = { ...current, turns: [...current.turns, turn] };
+  interviews[sessionId] = updated;
+  await setMap(KEYS.interviews, interviews);
+  return updated;
+}
+
+export async function saveInterviewEvaluation(sessionId: string, evaluation: InterviewEvaluation): Promise<void> {
+  const interviews = await getMap<StoredInterview>(KEYS.interviews);
+  const current = interviews[sessionId] ?? { sessionId, turns: [] };
+  interviews[sessionId] = { ...current, evaluation };
+  await setMap(KEYS.interviews, interviews);
 }
 
 export async function updateSessionHintState(
