@@ -1,4 +1,4 @@
-import { findLeafByExactText, type Stoppable } from './dom-heuristics';
+import { findLeafByExactText, extractEditorCode, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -132,7 +132,7 @@ export class LeetCodeAdapter implements CodingPlatformAdapter, Stoppable {
 
   async getEditorState(): Promise<EditorState | null> {
     const lang = findLeafByExactText(KNOWN_LANGUAGES);
-    return lang ? { language: lang.text } : null;
+    return lang ? { language: lang.text, code: extractEditorCode() } : null;
   }
 
   detectSubmission(): Promise<SubmissionEvent | null> {

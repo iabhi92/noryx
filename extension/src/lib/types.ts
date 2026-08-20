@@ -21,6 +21,10 @@ export type StoredProblem = Problem & ProblemMetadata & { firstSeenAt: number };
 
 export interface EditorState {
   language: string;
+  // Only populated when the user has opted in (settings.captureCode) — the AI coach can only
+  // give code-grounded feedback ("your loop bound is off on line N") instead of generic
+  // status-based hints if it can actually see what was submitted. Never captured by default.
+  code?: string;
 }
 
 export type SubmissionStatus =
@@ -38,6 +42,7 @@ export interface SubmissionEvent {
   runtime?: string;
   memory?: string;
   timestamp: number;
+  code?: string; // opt-in only, see EditorState.code
 }
 
 export interface StoredSubmission extends SubmissionEvent {

@@ -17,10 +17,14 @@ const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
 
 function buildPrompt(context: HintContext): string {
   const { problem, submissions, level, userMessage } = context;
-  const language = submissions[submissions.length - 1]?.language ?? 'the user\'s chosen language';
+  const latest = submissions[submissions.length - 1];
+  const language = latest?.language ?? 'the user\'s chosen language';
   const history = submissions.length
     ? submissions.map((s, i) => `  ${i + 1}. ${s.status}`).join('\n')
     : '  (no submissions yet)';
+  // Only present when the user opted into code capture (settings.captureCode) — see
+  // EditorState.code. Without it, hints stay status-based, same as before this existed.
+  const code = latest?.code;
 
   return [
     'You are Noryx, an AI coding tutor. Your job is to make the user a better independent problem',
@@ -30,6 +34,11 @@ function buildPrompt(context: HintContext): string {
     problem.topics?.length ? `Topics: ${problem.topics.join(', ')}` : null,
     `Language: ${language}`,
     `Submission history for this session:\n${history}`,
+    code
+      ? `\nThe user's most recently submitted code — ground your feedback in this specifically ` +
+        `(reference actual lines/logic, don't guess at what the bug might be) — but never rewrite, ` +
+        `complete, or fix it yourself unless explicitly asked for the solution:\n\`\`\`${language}\n${code}\n\`\`\``
+      : null,
     '',
     userMessage
       ? `The user says: "${userMessage}"\nRespond to what they said, while staying within this constraint: ${LEVEL_INSTRUCTIONS[level]}`

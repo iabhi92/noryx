@@ -1,4 +1,4 @@
-import { findLeafByExactText, SubmissionWatcher, type Stoppable } from './dom-heuristics';
+import { findLeafByExactText, extractEditorCode, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import { matchStatus } from './generic';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent } from '../types';
@@ -51,8 +51,10 @@ export class GeeksforGeeksAdapter implements CodingPlatformAdapter, Stoppable {
 
   async getEditorState(): Promise<EditorState | null> {
     // No native <select> found live — GFG's language picker is a custom dropdown component with
-    // no confirmed stable selector, so this stays unimplemented rather than guessing.
-    return null;
+    // no confirmed stable selector, so the language itself stays unguessed. Code extraction
+    // doesn't depend on that (.ace_editor confirmed present), so this is worth returning anyway.
+    const code = extractEditorCode();
+    return code ? { language: 'Unknown', code } : null;
   }
 
   detectSubmission(): Promise<SubmissionEvent | null> {

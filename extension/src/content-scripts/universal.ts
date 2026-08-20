@@ -1,5 +1,6 @@
 import { detectAdapter } from '../lib/adapters/universal-detector';
 import { problemKey } from '../lib/types';
+import { getSettings } from '../lib/settings';
 import type { RuntimeMessage } from '../lib/messages';
 import type { CodingPlatformAdapter } from '../lib/adapters/types';
 import type { Stoppable } from '../lib/adapters/dom-heuristics';
@@ -61,10 +62,15 @@ async function runSubmissionLoop(
     if (isCancelled() || !event) continue;
     const editorState = await adapter.getEditorState();
     lastKnownLanguage = editorState?.language ?? lastKnownLanguage;
+    // Privacy gate: adapters extract code unconditionally (it's just a local DOM read, no
+    // different from reading the language), but it only ever leaves this function — into
+    // storage, and from there to Gemini for hint generation — if the user opted in.
+    const settings = await getSettings();
+    const code = settings.captureCode ? editorState?.code : undefined;
     send({
       type: 'SUBMISSION',
       problemKey: key,
-      submission: { ...event, language: lastKnownLanguage },
+      submission: { ...event, language: lastKnownLanguage, code },
     });
   }
 }

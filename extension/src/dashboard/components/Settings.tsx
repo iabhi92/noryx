@@ -10,13 +10,21 @@ export default function Settings() {
   const [profileBusy, setProfileBusy] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [captureCode, setCaptureCode] = useState(false);
 
   useEffect(() => {
     void getSettings().then((s) => {
       setSavedKey(s.geminiApiKey ?? null);
       setShareUrl(s.publicProfile ? shareUrlFor(s.publicProfile.id) : null);
+      setCaptureCode(!!s.captureCode);
     });
   }, []);
+
+  async function handleToggleCaptureCode() {
+    const next = !captureCode;
+    await saveSettings({ captureCode: next });
+    setCaptureCode(next);
+  }
 
   async function handleSaveKey() {
     if (!keyInput.trim()) return;
@@ -151,11 +159,33 @@ export default function Settings() {
       </div>
 
       <div className="glass-card rounded-xl p-sm flex flex-col gap-xs">
+        <h3 className="font-headline-md text-body-lg font-bold text-on-surface">// code_analysis</h3>
+        <p className="text-on-surface-variant text-sm">
+          Off by default: Noryx only sees your submission's status ("Wrong Answer"), never the
+          code. Turn this on and it can read your editor's code when you submit, so hints get
+          grounded in what you actually wrote instead of generic status-based nudges. That code
+          goes to Gemini (same boundary as the API key above) and is stored locally alongside the
+          submission — nowhere else, and never for the public profile.
+        </p>
+        <button
+          onClick={() => void handleToggleCaptureCode()}
+          className={
+            captureCode
+              ? 'self-start bg-electric-blue/10 border border-electric-blue/40 text-electric-blue font-code-md text-xs py-2 px-4 uppercase transition-all'
+              : 'self-start bg-transparent border border-white/10 text-on-surface-variant font-code-md text-xs py-2 px-4 uppercase hover:border-white/30 transition-all'
+          }
+        >
+          {captureCode ? '✓ enabled — click to disable' : 'enable code analysis'}
+        </button>
+      </div>
+
+      <div className="glass-card rounded-xl p-sm flex flex-col gap-xs">
         <h3 className="font-headline-md text-body-lg font-bold text-on-surface">Local data</h3>
         <p className="text-on-surface-variant text-sm">
           Everything Noryx tracks — problems, sessions, submissions, hints — lives only in this
-          browser's local storage and is never sent anywhere, except the aggregate counts synced
-          for the public profile above if you've turned that on.
+          browser's local storage. It's never sent anywhere except: the aggregate counts synced
+          for the public profile above (if enabled), and your code going to Gemini for hint
+          generation (only if code analysis above is enabled).
         </p>
         <button
           onClick={() => void handleClearData()}

@@ -1,4 +1,4 @@
-import { findLeafByExactText, SubmissionWatcher, type Stoppable } from './dom-heuristics';
+import { findLeafByExactText, extractEditorCode, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent, SubmissionStatus } from '../types';
 
@@ -83,11 +83,12 @@ export class GenericCodingAdapter implements CodingPlatformAdapter, Stoppable {
   }
 
   async getEditorState(): Promise<EditorState | null> {
+    const code = extractEditorCode();
     const lang = findLeafByExactText(KNOWN_LANGUAGES);
-    if (lang) return { language: lang.text };
+    if (lang) return { language: lang.text, code };
     const select = document.querySelector('select');
     const selected = select?.selectedOptions?.[0]?.textContent?.trim();
-    return selected ? { language: selected } : null;
+    return selected ? { language: selected, code } : null;
   }
 
   detectSubmission(): Promise<SubmissionEvent | null> {

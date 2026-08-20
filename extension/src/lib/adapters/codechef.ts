@@ -1,4 +1,4 @@
-import { findLeafMatching, SubmissionWatcher, type Stoppable } from './dom-heuristics';
+import { findLeafMatching, extractEditorCode, SubmissionWatcher, type Stoppable } from './dom-heuristics';
 import { matchStatus } from './generic';
 import type { CodingPlatformAdapter } from './types';
 import type { Problem, ProblemMetadata, EditorState, SubmissionEvent } from '../types';
@@ -54,8 +54,11 @@ export class CodeChefAdapter implements CodingPlatformAdapter, Stoppable {
 
   async getEditorState(): Promise<EditorState | null> {
     // No native <select> found live — CodeChef's language picker is a custom dropdown with no
-    // confirmed stable selector, so this stays unimplemented rather than guessing.
-    return null;
+    // confirmed stable selector, so the language itself stays unguessed. Code extraction doesn't
+    // depend on that though (.ace_editor confirmed present), so this is worth returning even
+    // without a known language.
+    const code = extractEditorCode();
+    return code ? { language: 'Unknown', code } : null;
   }
 
   detectSubmission(): Promise<SubmissionEvent | null> {

@@ -17,6 +17,36 @@ export function findLeafByExactText(candidates: string[]): { text: string; el: E
   return findLeafMatching((text) => candidates.includes(text));
 }
 
+/** Best-effort code extraction from whichever editor widget is on the page. Only ever called
+ *  when the user has opted in (settings.captureCode) — see EditorState.code. Monaco and Ace both
+ *  virtualize rendering (only visible lines actually exist in the DOM, recycled as you scroll),
+ *  so this can miss lines scrolled out of view on a very long solution — acceptable for
+ *  typical DSA-length code, and honestly better than nothing rather than false precision. */
+export function extractEditorCode(): string | undefined {
+  const monacoLines = document.querySelector('.monaco-editor .view-lines');
+  if (monacoLines) {
+    const lines = Array.from(monacoLines.querySelectorAll<HTMLElement>('.view-line'))
+      .sort((a, b) => (parseInt(a.style.top) || 0) - (parseInt(b.style.top) || 0))
+      .map((el) => el.textContent ?? '');
+    if (lines.length) return lines.join('\n');
+  }
+
+  const aceLines = document.querySelector('.ace_editor .ace_text-layer');
+  if (aceLines) {
+    const lines = Array.from(aceLines.querySelectorAll('.ace_line')).map((el) => el.textContent ?? '');
+    if (lines.length) return lines.join('\n');
+  }
+
+  const cmContent = document.querySelector('.CodeMirror-code, .cm-content');
+  const cmText = cmContent?.textContent?.trim();
+  if (cmText) return cmText;
+
+  const textarea = document.querySelector<HTMLTextAreaElement>('textarea');
+  if (textarea?.value) return textarea.value;
+
+  return undefined;
+}
+
 export type StatusMatcher = (text: string) => SubmissionStatus | null;
 
 /** Implemented by adapters that hold a live MutationObserver, so the content script can tear it
