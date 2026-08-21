@@ -9,13 +9,15 @@
   inset: 0;
   z-index: -1;
   display: flex;
-  /* Anchored to the bottom-right of the content area, not centered on the page: dead-center put
-     it directly behind the main content column, getting clipped unpredictably by whatever card
-     happened to be there. A corner accent reads as intentional regardless of how much content is
-     on screen, and doesn't fight the sidebar/cards for the same visual space. */
-  justify-content: flex-end;
+  /* Bottom-anchored, horizontally centered within the content area — not a small corner icon
+     (too tucked away to read as atmosphere, per feedback) and not dead-center either (that's what
+     clipped unpredictably against whatever card happened to be there originally). Anchoring only
+     the bottom edge gives one stable reference point regardless of window height, while centering
+     horizontally lets the scene actually dominate the frame the way game_design's own "room
+     lighting should be visible" background is meant to. */
+  justify-content: center;
   align-items: flex-end;
-  padding: 0 3vw 4vh 0;
+  padding-bottom: 2vh;
   overflow: hidden;
   pointer-events: none;
   background-image: radial-gradient(circle, #171424, black);
@@ -44,9 +46,11 @@
   position: absolute;
   /* min() of a vw and a vh basis instead of a flat 28vw: keeps the scene sized sensibly (and
      square, which its isometric math depends on) whichever dimension is tighter, instead of
-     overflowing on a short window or a narrow one. */
-  width: min(22vw, 32vh);
-  height: min(22vw, 32vh);
+     overflowing on a short window or a narrow one. Sized up from the first pass (22vw/32vh) —
+     that read as a small corner sticker instead of ambient environment; this is close to the
+     original demo's own scale, just correctly positioned now instead of dead-center. */
+  width: min(34vw, 52vh);
+  height: min(34vw, 52vh);
   transform: perspective(1250px) rotateX(75deg) rotateZ(45deg) translateZ(-9vw); }
 
 .room-bg-layer .h-shadow {
