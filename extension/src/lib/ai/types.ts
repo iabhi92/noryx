@@ -6,6 +6,7 @@ import type {
   HintLevel,
   InterviewTurn,
   PracticeTestCase,
+  LearnerProfile,
 } from '../types';
 
 // Shape TBD — analyzeSession belongs to personal memory (PRD §10-11) and analyzeSolution to
@@ -36,12 +37,49 @@ export interface ProgressInsight {
   generatedAt: number;
 }
 
+// The full-history input to the periodic deep-synthesis pass (see gemini-provider.ts's
+// synthesizeLearnerProfile) — deliberately richer than ProgressContext's plain counts, since this
+// runs infrequently and is meant to actually reason over patterns, not just tally them. Pulls
+// across every feature that tracks something about how the user solves, not just submissions:
+// hint-level usage (dependency trend), review-queue box state (what keeps getting forgotten), and
+// interview scores (self-reported-adjacent signal from a structured evaluation).
+export interface LearnerProfileHistoryItem {
+  platform: string;
+  title: string;
+  difficulty?: string;
+  topics?: string[];
+  finalStatus: string;
+  attempts: number;
+  activeMs: number;
+  hintLevelsRequested: Array<HintLevel | 'solution'>;
+  solvedAt?: number;
+}
+
+export interface LearnerProfileContext {
+  totalAccepted: number;
+  history: LearnerProfileHistoryItem[];
+  // problemKey isn't meaningful to the model; title is what it can reason about, so this is
+  // titles of problems currently sitting at Leitner box 0 (the review queue's "recently forgot"
+  // signal) — see storage.ts's REVIEW_INTERVAL_DAYS.
+  recentlyForgotten: string[];
+  interviewScores: Array<{
+    problemTitle: string;
+    communication: number;
+    problemSolving: number;
+    complexityAwareness: number;
+  }>;
+}
+
 export interface HintContext {
   problem: Problem & ProblemMetadata;
   session: CodingSession;
   submissions: StoredSubmission[];
   level: HintLevel | 'solution';
   userMessage?: string;
+  // Optional: when present, hints get grounded in the learner's demonstrated history across
+  // *all* sessions, not just this one. Absent for brand-new users with no profile yet — hints
+  // degrade gracefully to the same generic-but-real behavior as before this existed.
+  learnerProfile?: LearnerProfile;
 }
 
 export interface Hint {

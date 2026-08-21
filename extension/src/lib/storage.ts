@@ -12,8 +12,9 @@ import type {
   StoredInterview,
   ReviewState,
   PracticeProblem,
+  LearnerProfile,
 } from './types';
-import type { ProgressInsight } from './ai/types';
+import type { ProgressInsight, LearnerProfileContext, LearnerProfileHistoryItem } from './ai/types';
 
 const KEYS = {
   problems: 'noryx:problems',
@@ -24,6 +25,7 @@ const KEYS = {
   interviews: 'noryx:interviews',
   reviews: 'noryx:reviews',
   practiceProblem: 'noryx:practiceProblem',
+  learnerProfile: 'noryx:learnerProfile',
 } as const;
 
 // Leitner boxes: index = box number, value = days until next due. Correct recall advances a
@@ -217,6 +219,71 @@ export async function getPracticeProblem(): Promise<PracticeProblem | null> {
 
 export async function savePracticeProblem(problem: PracticeProblem): Promise<void> {
   await chrome.storage.local.set({ [KEYS.practiceProblem]: problem });
+}
+
+export async function getLearnerProfile(): Promise<LearnerProfile | null> {
+  const result = await chrome.storage.local.get(KEYS.learnerProfile);
+  return (result[KEYS.learnerProfile] as LearnerProfile) ?? null;
+}
+
+export async function saveLearnerProfile(profile: LearnerProfile): Promise<void> {
+  await chrome.storage.local.set({ [KEYS.learnerProfile]: profile });
+}
+
+export async function getLearnerProfileContext(): Promise<LearnerProfileContext> {
+  const [sessions, problems, submissionsBySession, hintsBySession, reviews, interviews] = await Promise.all([
+    getAllSessions(),
+    getAllProblems(),
+    getAllSubmissions(),
+    getAllHints(),
+    getMap<ReviewState>(KEYS.reviews),
+    getMap<StoredInterview>(KEYS.interviews),
+  ]);
+
+  const sessionList = Object.values(sessions);
+  let totalAccepted = 0;
+
+  const history: LearnerProfileHistoryItem[] = sessionList
+    .map((session): LearnerProfileHistoryItem | null => {
+      const problem = problems[session.problemKey];
+      if (!problem) return null;
+      const submissions = submissionsBySession[session.id] ?? [];
+      const accepted = submissions.find((s) => s.status === 'Accepted');
+      if (accepted) totalAccepted += 1;
+      const hints = hintsBySession[session.id] ?? [];
+      return {
+        platform: problem.platform,
+        title: problem.title,
+        difficulty: problem.difficulty,
+        topics: problem.topics,
+        finalStatus: submissions[submissions.length - 1]?.status ?? 'In Progress',
+        attempts: session.attempts,
+        activeMs: session.activeMs,
+        hintLevelsRequested: hints.map((h) => h.level),
+        solvedAt: accepted?.timestamp,
+      };
+    })
+    .filter((item): item is LearnerProfileHistoryItem => item !== null);
+
+  const recentlyForgotten = Object.values(reviews)
+    .filter((r) => r.box === 0)
+    .map((r) => problems[r.problemKey]?.title)
+    .filter((title): title is string => !!title);
+
+  const interviewScores = Object.values(interviews)
+    .filter((i): i is StoredInterview & { evaluation: NonNullable<StoredInterview['evaluation']> } => !!i.evaluation)
+    .map((i) => {
+      const problemKeyForSession = sessionList.find((s) => s.id === i.sessionId)?.problemKey;
+      const title = problemKeyForSession ? problems[problemKeyForSession]?.title : undefined;
+      return {
+        problemTitle: title ?? 'Unknown problem',
+        communication: i.evaluation.communication,
+        problemSolving: i.evaluation.problemSolving,
+        complexityAwareness: i.evaluation.complexityAwareness,
+      };
+    });
+
+  return { totalAccepted, history, recentlyForgotten, interviewScores };
 }
 
 export async function updateSessionHintState(

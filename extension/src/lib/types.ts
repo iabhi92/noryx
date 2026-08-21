@@ -133,6 +133,31 @@ export interface PracticeProblem {
   generatedAt: number;
 }
 
+// The "gets smarter the more you solve" mechanism: a synthesized read on the learner's actual
+// demonstrated patterns, built periodically from their full history (not just the current
+// session) and then fed back into every future hint prompt — see gemini-provider.ts's
+// synthesizeLearnerProfile and buildPrompt. Every field must trace to real tracked data; a
+// synthesis with no real signal yet (few solves) should say so plainly rather than inventing
+// patterns, same rule buildRoadmapPrompt already follows.
+export interface TopicSignal {
+  topic: string;
+  signal: 'strong' | 'developing' | 'weak';
+  evidence: string;
+}
+
+export interface LearnerProfile {
+  generatedAt: number;
+  // How many Accepted submissions existed when this was built — the resync trigger compares this
+  // against the current count so re-synthesis only fires after real new signal, not on a timer.
+  basedOnAcceptedCount: number;
+  topicSignals: TopicSignal[];
+  mistakePatterns: string[];
+  paceTrend: string;
+  hintDependencyTrend: string;
+  focusRecommendation: string;
+  summary: string;
+}
+
 export function problemKey(platform: Platform, externalId: string): string {
   return `${platform}:${externalId}`;
 }

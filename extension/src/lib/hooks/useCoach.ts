@@ -1,5 +1,5 @@
 import { useState, type KeyboardEvent } from 'react';
-import { addHint, updateSessionHintState } from '../storage';
+import { addHint, updateSessionHintState, getLearnerProfile } from '../storage';
 import { GeminiProvider } from '../ai/gemini-provider';
 import { MAX_AUTO_HINT_LEVEL } from '../ai/intervention';
 import { AIProviderError } from '../ai/types';
@@ -30,12 +30,14 @@ export function useCoach(apiKey: string | null, active: CoachTarget | null, onDo
     setQuestion('');
     try {
       const provider = new GeminiProvider(apiKey);
+      const learnerProfile = await getLearnerProfile();
       const hint = await provider.generateHint({
         problem: active.problem,
         session: active.session,
         submissions: active.submissions,
         level,
         userMessage,
+        learnerProfile: learnerProfile ?? undefined,
       });
       const now = Date.now();
       await addHint({

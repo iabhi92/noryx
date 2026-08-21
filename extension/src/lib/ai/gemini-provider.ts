@@ -6,14 +6,23 @@ import type {
   ProgressInsight,
   InterviewContext,
   GeneratedPracticeProblem,
+  LearnerProfileContext,
 } from './types';
 import { AIProviderError } from './types';
-import type { InterviewEvaluation } from '../types';
+import type { InterviewEvaluation, LearnerProfile, TopicSignal } from '../types';
 
 // Gemini Flash-Lite class model per the PRD's "free-tier access" requirement. Verified live
 // against the real API (2026-08-20) — gemini-2.0-flash-lite has since been retired; Google's own
 // 404 response pointed to this replacement. Bump again if it's retired in turn.
 const MODEL = 'gemini-3.5-flash-lite';
+
+// The deep-synthesis pass (see synthesizeLearnerProfile) runs infrequently — every few solves,
+// not per-interaction — so it's worth spending a more capable model on it instead of the
+// interactive path's fast/cheap tier. NOT live-verified against the real API from this
+// environment (no key available here to test with, unlike MODEL above) — Google's current docs
+// list this as the current flagship id as of 2026-08-21, but if it 404s, that's the first thing
+// to check, same as MODEL's own retirement note.
+const SYNTHESIS_MODEL = 'gemini-3-pro-preview';
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
@@ -28,7 +37,7 @@ const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
 };
 
 function buildPrompt(context: HintContext): string {
-  const { problem, submissions, level, userMessage } = context;
+  const { problem, submissions, level, userMessage, learnerProfile } = context;
   const latest = submissions[submissions.length - 1];
   const language = latest?.language ?? 'the user\'s chosen language';
   const history = submissions.length
@@ -50,6 +59,14 @@ function buildPrompt(context: HintContext): string {
       ? `\nThe user's most recently submitted code — ground your feedback in this specifically ` +
         `(reference actual lines/logic, don't guess at what the bug might be) — but never rewrite, ` +
         `complete, or fix it yourself unless explicitly asked for the solution:\n\`\`\`${language}\n${code}\n\`\`\``
+      : null,
+    learnerProfile
+      ? `\nWhat you know about this learner from their history (use it to make this hint specific ` +
+        `to them, e.g. connect this problem to a pattern they've struggled with before — but only ` +
+        `if it's actually relevant to this problem, don't force a connection that isn't there):\n` +
+        `- Topic signals: ${learnerProfile.topicSignals.map((t) => `${t.topic} (${t.signal}: ${t.evidence})`).join('; ') || 'none yet'}\n` +
+        `- Recurring mistake patterns: ${learnerProfile.mistakePatterns.join('; ') || 'none identified yet'}\n` +
+        `- Hint dependency trend: ${learnerProfile.hintDependencyTrend}`
       : null,
     '',
     userMessage
@@ -168,6 +185,57 @@ function buildPracticeProblemPrompt(topic: string, difficulty: string): string {
   ].join('\n');
 }
 
+function buildLearnerProfilePrompt(context: LearnerProfileContext): string {
+  const { history, recentlyForgotten, interviewScores } = context;
+
+  const historyLines = history.length
+    ? history
+        .map((h) => {
+          const hints = h.hintLevelsRequested.length ? h.hintLevelsRequested.join(',') : 'none';
+          return (
+            `  - ${h.title} [${h.platform}${h.difficulty ? `, ${h.difficulty}` : ''}` +
+            `${h.topics?.length ? `, topics: ${h.topics.join('/')}` : ''}]: ${h.finalStatus}, ` +
+            `${h.attempts} attempt(s), hint levels used: ${hints}`
+          );
+        })
+        .join('\n')
+    : '  (no tracked sessions yet)';
+
+  const forgottenLine = recentlyForgotten.length
+    ? `Problems the spaced-repetition review queue shows were just forgotten (self-reported, box reset to 0): ${recentlyForgotten.join(', ')}`
+    : 'No problems currently marked forgotten in the review queue.';
+
+  const interviewLines = interviewScores.length
+    ? interviewScores
+        .map((s) => `  - ${s.problemTitle}: communication ${s.communication}/5, problem-solving ${s.problemSolving}/5, complexity awareness ${s.complexityAwareness}/5`)
+        .join('\n')
+    : '  (no scored mock interviews yet)';
+
+  return [
+    'You are Noryx, synthesizing a learner profile from a coding practice history. This profile',
+    "gets fed back into every future hint, so it needs to be genuinely useful, specific, and true",
+    'to the data below — never invent a pattern, topic weakness, or mistake type that the evidence',
+    "doesn't actually support. If the history is too thin to say something real, say that plainly",
+    'in the summary and leave topicSignals/mistakePatterns sparse or empty rather than padding them.',
+    '',
+    `Session history (${history.length} tracked sessions):\n${historyLines}`,
+    '',
+    forgottenLine,
+    '',
+    `Mock interview scores:\n${interviewLines}`,
+    '',
+    'Respond with ONLY a JSON object, no markdown fences, no other text, in exactly this shape:',
+    '{"topicSignals": [{"topic": "...", "signal": "strong"|"developing"|"weak", "evidence": "one ' +
+      'sentence citing the actual data point(s) behind this"}], "mistakePatterns": ["specific, ' +
+      'concrete recurring error types actually observable in the data, not generic advice"], ' +
+      '"paceTrend": "one sentence on whether time-to-solve or attempts-per-problem is trending, ' +
+      'or say there is not enough data", "hintDependencyTrend": "one sentence on whether hint ' +
+      'usage is increasing, decreasing, or flat across sessions", "focusRecommendation": "one ' +
+      'concrete, specific next-step recommendation grounded in the weakest real signal above", ' +
+      '"summary": "2-3 sentence honest overview"}',
+  ].join('\n');
+}
+
 interface GeminiResponse {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 }
@@ -175,8 +243,8 @@ interface GeminiResponse {
 export class GeminiProvider implements HintProvider {
   constructor(private apiKey: string) {}
 
-  private async callGemini(prompt: string, jsonMode = false): Promise<string> {
-    const url = `${API_BASE}/${MODEL}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
+  private async callGemini(prompt: string, jsonMode = false, model = MODEL): Promise<string> {
+    const url = `${API_BASE}/${model}:generateContent?key=${encodeURIComponent(this.apiKey)}`;
 
     let response: Response;
     try {
@@ -272,6 +340,46 @@ export class GeminiProvider implements HintProvider {
       functionName: parsed.functionName,
       testCases: parsed.testCases,
       referenceSolutionJS: parsed.referenceSolutionJS,
+    };
+  }
+
+  async synthesizeLearnerProfile(context: LearnerProfileContext): Promise<LearnerProfile> {
+    const raw = await this.callGemini(buildLearnerProfilePrompt(context), true, SYNTHESIS_MODEL);
+    let parsed: Partial<LearnerProfile>;
+    try {
+      parsed = JSON.parse(raw) as Partial<LearnerProfile>;
+    } catch {
+      throw new AIProviderError("Gemini's learner-profile synthesis wasn't valid JSON — try again.");
+    }
+
+    const isTopicSignal = (t: unknown): t is TopicSignal =>
+      !!t &&
+      typeof t === 'object' &&
+      typeof (t as TopicSignal).topic === 'string' &&
+      ['strong', 'developing', 'weak'].includes((t as TopicSignal).signal) &&
+      typeof (t as TopicSignal).evidence === 'string';
+
+    if (
+      !Array.isArray(parsed.topicSignals) ||
+      !parsed.topicSignals.every(isTopicSignal) ||
+      !Array.isArray(parsed.mistakePatterns) ||
+      typeof parsed.paceTrend !== 'string' ||
+      typeof parsed.hintDependencyTrend !== 'string' ||
+      typeof parsed.focusRecommendation !== 'string' ||
+      typeof parsed.summary !== 'string'
+    ) {
+      throw new AIProviderError("Gemini's learner-profile synthesis wasn't in the expected format — try again.");
+    }
+
+    return {
+      generatedAt: Date.now(),
+      basedOnAcceptedCount: context.totalAccepted,
+      topicSignals: parsed.topicSignals,
+      mistakePatterns: parsed.mistakePatterns.filter((m): m is string => typeof m === 'string'),
+      paceTrend: parsed.paceTrend,
+      hintDependencyTrend: parsed.hintDependencyTrend,
+      focusRecommendation: parsed.focusRecommendation,
+      summary: parsed.summary,
     };
   }
 }

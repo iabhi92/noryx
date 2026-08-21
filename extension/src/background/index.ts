@@ -7,6 +7,9 @@ import {
   getSubmissionsForSession,
   addHint,
   updateSessionHintState,
+  getLearnerProfile,
+  saveLearnerProfile,
+  getLearnerProfileContext,
 } from '../lib/storage';
 import { problemKey, type HintLevel } from '../lib/types';
 import { getSettings } from '../lib/settings';
@@ -83,6 +86,7 @@ async function handleMessage(message: RuntimeMessage): Promise<void> {
       await recordSubmission(message.problemKey, message.submission);
       void maybeIntervene(message.problemKey);
       void maybeSyncPublicProfile();
+      void maybeUpdateLearnerProfile();
       break;
   }
 }
@@ -105,9 +109,16 @@ async function maybeIntervene(key: string): Promise<void> {
 
   const nextLevel = Math.min(session.hintLevel + 1, MAX_AUTO_HINT_LEVEL) as HintLevel;
   const provider = new GeminiProvider(settings.geminiApiKey);
+  const learnerProfile = await getLearnerProfile();
 
   try {
-    const hint = await provider.generateHint({ problem, session, submissions, level: nextLevel });
+    const hint = await provider.generateHint({
+      problem,
+      session,
+      submissions,
+      level: nextLevel,
+      learnerProfile: learnerProfile ?? undefined,
+    });
     const now = Date.now();
     await addHint({ sessionId: session.id, level: hint.level, text: hint.text, createdAt: now, auto: true });
     await updateSessionHintState(session.id, nextLevel, now);
@@ -129,6 +140,34 @@ async function maybeIntervene(key: string): Promise<void> {
     // Conservative-by-design: a failed hint (bad key, rate limit, network) should never crash
     // the service worker or block tracking. It just quietly doesn't nudge this time.
     console.warn('[Noryx] hint generation failed:', err);
+  }
+}
+
+// Every few solves, not every solve — the deep-synthesis model is intentionally the expensive,
+// infrequent side of the two-tier setup (see SYNTHESIS_MODEL in gemini-provider.ts), so this only
+// re-runs once real new signal exists, not on a timer or every submission.
+const LEARNER_PROFILE_RESYNC_THRESHOLD = 3;
+
+async function maybeUpdateLearnerProfile(): Promise<void> {
+  const settings = await getSettings();
+  if (!settings.geminiApiKey) return;
+
+  const context = await getLearnerProfileContext();
+  if (context.totalAccepted === 0) return;
+
+  const existing = await getLearnerProfile();
+  const dueForResync =
+    !existing || context.totalAccepted - existing.basedOnAcceptedCount >= LEARNER_PROFILE_RESYNC_THRESHOLD;
+  if (!dueForResync) return;
+
+  try {
+    const provider = new GeminiProvider(settings.geminiApiKey);
+    const profile = await provider.synthesizeLearnerProfile(context);
+    await saveLearnerProfile(profile);
+  } catch (err) {
+    // Same rule as maybeIntervene: a failed synthesis (bad key, rate limit, malformed response)
+    // never blocks tracking — hints just keep using whatever profile (or none) already existed.
+    console.warn('[Noryx] learner profile synthesis failed:', err);
   }
 }
 
