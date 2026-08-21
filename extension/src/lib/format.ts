@@ -15,3 +15,13 @@ export function formatDuration(ms: number): string {
   const minutes = totalMinutes % 60;
   return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
 }
+
+/** "just now" / "2m ago" / "3h ago" / "1d ago" — chat-style timestamps (CoachPanel, InterviewPanel). */
+export function formatTimeAgo(ts: number): string {
+  const minutes = Math.floor((Date.now() - ts) / 60000);
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return `${Math.floor(hours / 24)}d ago`;
+}

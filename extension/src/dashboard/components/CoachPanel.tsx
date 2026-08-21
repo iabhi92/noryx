@@ -8,7 +8,7 @@ import {
 } from '../../lib/storage';
 import { getSettings } from '../../lib/settings';
 import { useCoach, type CoachTarget } from '../../lib/hooks/useCoach';
-import { formatElapsed } from '../../lib/format';
+import { formatElapsed, formatTimeAgo } from '../../lib/format';
 import { CircularTimer } from '../../lib/CircularTimer';
 import { MAX_AUTO_HINT_LEVEL } from '../../lib/ai/intervention';
 import { Skeleton } from './Skeleton';
@@ -66,14 +66,20 @@ const LEVEL_LABEL: Record<StoredHint['level'], string> = {
 
 function TypingBubble() {
   return (
-    <div className="chat-block-agent flex gap-1 items-center">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="w-1.5 h-1.5 rounded-full bg-electric-blue/60 animate-bounce"
-          style={{ animationDelay: `${i * 120}ms` }}
-        />
-      ))}
+    <div className="chat-block-agent">
+      <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
+        <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+        coach.noryx
+      </div>
+      <div className="flex gap-1 items-center">
+        {[0, 1, 2].map((i) => (
+          <span
+            key={i}
+            className="w-1.5 h-1.5 rounded-full bg-electric-blue/60 animate-bounce"
+            style={{ animationDelay: `${i * 120}ms` }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -257,7 +263,8 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
       >
         {hints.length === 0 && !busy && (
           <div className="chat-block-agent">
-            <div className="text-[10px] text-electric-blue mb-1 uppercase tracking-wider opacity-80">
+            <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
+              <span className="material-symbols-outlined text-[14px]">smart_toy</span>
               coach.noryx // sys.msg
             </div>
             <p className="text-on-surface/90 leading-relaxed">
@@ -267,19 +274,24 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
           </div>
         )}
         {hints.map((h) => (
-          <div key={h.id}>
+          <div key={h.id} className="flex flex-col gap-6">
             {h.userMessage && (
               <div className="chat-block-user">
-                <div className="text-[10px] text-on-surface-variant mb-1 uppercase tracking-wider opacity-80">
+                <div className="flex items-center justify-end gap-1.5 text-[10px] text-on-surface-variant mb-1.5 uppercase tracking-wider opacity-80">
                   usr.local // reply
+                  <span className="material-symbols-outlined text-[14px]">person</span>
                 </div>
                 <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{h.userMessage}</p>
               </div>
             )}
             <div className="chat-block-agent">
-              <div className="text-[10px] text-electric-blue mb-1 uppercase tracking-wider opacity-80">
-                coach.noryx // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
-                {h.auto ? ' · auto' : ''}
+              <div className="flex items-center justify-between gap-2 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
+                <span className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                  coach.noryx // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
+                  {h.auto ? ' · auto' : ''}
+                </span>
+                <span className="text-on-surface-variant/70 normal-case tracking-normal">{formatTimeAgo(h.createdAt)}</span>
               </div>
               <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{h.text}</p>
             </div>

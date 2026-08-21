@@ -3,6 +3,7 @@ import { getInterview, appendInterviewTurn, saveInterviewEvaluation } from '../.
 import { GeminiProvider } from '../../lib/ai/gemini-provider';
 import { AIProviderError } from '../../lib/ai/types';
 import { CircularTimer } from '../../lib/CircularTimer';
+import { formatTimeAgo } from '../../lib/format';
 import type { CoachTarget } from '../../lib/hooks/useCoach';
 import type { InterviewTurn, InterviewEvaluation } from '../../lib/types';
 
@@ -146,7 +147,8 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
             <ScoreBar label={SCORE_LABEL.complexityAwareness} value={evaluation.complexityAwareness} />
           </div>
           <div className="chat-block-agent">
-            <span className="msg-label text-electric-blue text-[10px] uppercase tracking-wide block mb-1">
+            <span className="flex items-center gap-1.5 text-electric-blue text-[10px] uppercase tracking-wide mb-1.5 opacity-90">
+              <span className="material-symbols-outlined text-[14px]">smart_toy</span>
               coach.noryx // feedback
             </span>
             <p className="text-on-surface/90 text-sm leading-relaxed">{evaluation.summary}</p>
@@ -154,16 +156,36 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
         </div>
       ) : (
         <>
-          <div ref={chatRef} className="flex flex-col gap-4 max-h-[60vh] min-h-[16rem] overflow-y-auto pr-1 font-code-md text-sm">
+          <div ref={chatRef} className="flex flex-col gap-6 max-h-[60vh] min-h-[16rem] overflow-y-auto pr-1 font-code-md text-sm">
             {turns.map((t, i) => (
               <div key={i} className={t.role === 'interviewer' ? 'chat-block-agent' : 'chat-block-user'}>
-                <div className="text-[10px] mb-1 uppercase tracking-wider opacity-80 text-electric-blue">
-                  {t.role === 'interviewer' ? 'interviewer' : 'you'}
+                <div
+                  className={
+                    t.role === 'interviewer'
+                      ? 'flex items-center justify-between gap-2 text-[10px] mb-1.5 uppercase tracking-wider opacity-90 text-electric-blue'
+                      : 'flex items-center justify-between gap-2 text-[10px] mb-1.5 uppercase tracking-wider opacity-80 text-on-surface-variant'
+                  }
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-[14px]">
+                      {t.role === 'interviewer' ? 'smart_toy' : 'person'}
+                    </span>
+                    {t.role === 'interviewer' ? 'interviewer' : 'you'}
+                  </span>
+                  <span className="opacity-70 normal-case tracking-normal">{formatTimeAgo(t.at)}</span>
                 </div>
                 <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{t.text}</p>
               </div>
             ))}
-            {busy && <div className="chat-block-agent text-on-surface-variant text-xs">thinking…</div>}
+            {busy && (
+              <div className="chat-block-agent">
+                <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
+                  <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                  interviewer
+                </div>
+                <span className="text-on-surface-variant text-xs">thinking…</span>
+              </div>
+            )}
           </div>
 
           {error && <p className="text-error text-sm font-code-md">{error}</p>}

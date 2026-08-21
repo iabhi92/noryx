@@ -37,14 +37,32 @@
 .neon-text-glow {
   text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
 }
+/* Real chat bubbles, not log lines — a card per turn (background + border + radius) beats a bare
+   border-left/right rule for reading "this is a conversation" at a glance. Margin-auto on a
+   flex-column child overrides stretch and self-positions on the cross axis (standard flexbox
+   auto-margin behavior), so these still land left/right without the parent needing flex classes. */
+@keyframes chat-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.chat-block-agent,
+.chat-block-user {
+  max-width: 88%;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  animation: chat-in 0.25s ease-out;
+}
 .chat-block-agent {
-  border-left: 2px solid rgba(0, 240, 255, 0.4);
-  padding-left: 1rem;
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-top-left-radius: 0.2rem;
+  margin-right: auto;
 }
 .chat-block-user {
-  border-right: 2px solid rgba(255, 255, 255, 0.2);
-  padding-right: 1rem;
-  text-align: right;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-top-right-radius: 0.2rem;
+  margin-left: auto;
 }
 /* CoachPanel composer — a slow breathing glow signals "ready for input" while idle; skipped
    entirely while busy (see the .composer-pulse toggle in CoachPanel.tsx) so it doesn't imply you
