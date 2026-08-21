@@ -34,6 +34,20 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
   void handleMessage(message);
 });
 
+// The heartbeat-triggered sync above only fires while a tracked coding-platform tab is open and
+// active — go quiet for a day and the public profile's "last updated" goes just as quiet, even
+// though nothing's actually broken. This alarm re-syncs on a fixed cadence regardless of activity
+// (syncPublicProfile() itself still no-ops without an enabled profile), so the link stays
+// current-looking for whoever has it, not just fresh right after a coding session.
+const PROFILE_SYNC_ALARM = 'noryx-profile-sync';
+if (chrome.alarms) {
+  chrome.alarms.create(PROFILE_SYNC_ALARM, { periodInMinutes: 15 });
+  chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name !== PROFILE_SYNC_ALARM) return;
+    void syncPublicProfile().catch((err) => console.warn('[Noryx] public profile sync failed:', err));
+  });
+}
+
 // Safari has no chrome.notifications (see the guard below), so an auto-generated hint would
 // otherwise land silently in storage with nothing telling the user it happened — defeating the
 // PRD's actual point that coaching should be proactive, not something you have to go check for.
