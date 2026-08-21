@@ -81,6 +81,11 @@
 ::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.3); }
 body {
   font-family: 'Geist', sans-serif;
+  /* Fixed-position translucent surfaces (Sidebar's glass-card, RoomBackground) need a solid dark
+     canvas behind them at the true page root — without it they composite against the browser's
+     default white. Kept off the App root div itself (see App.tsx) so RoomBackground's negative
+     z-index still lands behind real content instead of behind an opaque sibling background. */
+  background-color: #131313;
 }
 
 @media (prefers-reduced-motion: reduce) {

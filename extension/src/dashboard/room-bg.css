@@ -9,11 +9,24 @@
   inset: 0;
   z-index: -1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  /* Anchored to the bottom-right of the content area, not centered on the page: dead-center put
+     it directly behind the main content column, getting clipped unpredictably by whatever card
+     happened to be there. A corner accent reads as intentional regardless of how much content is
+     on screen, and doesn't fight the sidebar/cards for the same visual space. */
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 0 3vw 4vh 0;
   overflow: hidden;
   pointer-events: none;
   background-image: radial-gradient(circle, #171424, black);
+}
+
+@media (min-width: 768px) {
+  /* Sidebar.tsx is fixed, w-64 (16rem), shown from this same Tailwind `md` breakpoint up — center
+     within the actual visible content area, not the full viewport underneath the sidebar. */
+  .room-bg-layer {
+    left: 16rem;
+  }
 }
 
 .room-bg-layer, .room-bg-layer *, .room-bg-layer *::after, .room-bg-layer *::before {
@@ -29,8 +42,11 @@
 
 .room-bg-layer .house {
   position: absolute;
-  width: 28vw;
-  height: 28vw;
+  /* min() of a vw and a vh basis instead of a flat 28vw: keeps the scene sized sensibly (and
+     square, which its isometric math depends on) whichever dimension is tighter, instead of
+     overflowing on a short window or a narrow one. */
+  width: min(22vw, 32vh);
+  height: min(22vw, 32vh);
   transform: perspective(1250px) rotateX(75deg) rotateZ(45deg) translateZ(-9vw); }
 
 .room-bg-layer .h-shadow {
