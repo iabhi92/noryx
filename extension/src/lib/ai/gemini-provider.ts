@@ -21,7 +21,10 @@ const LEVEL_INSTRUCTIONS: Record<HintContext['level'], string> = {
   2: 'Give one small directional hint about the kind of data structure or technique that might help, without naming the specific pattern outright. Do not write any code.',
   3: "Name the relevant algorithmic pattern or technique clearly (e.g. \"this is a sliding-window problem\"), but don't explain how to implement it. Do not write any code.",
   4: 'Explain the complete algorithmic approach in plain language — what to do and why it works — but do not write any code.',
-  solution: 'Write a complete, correct solution in the language given below, with a brief explanation of the approach above the code.',
+  solution:
+    'Write a complete, correct solution in the language given below, with a brief explanation of ' +
+    'the approach above the code. Put the code itself in a markdown fence (```<language> ... ```) ' +
+    "so it's clearly separated from the explanation.",
 };
 
 function buildPrompt(context: HintContext): string {

@@ -17,14 +17,46 @@
   background-size: 20px 20px;
 }
 .glass-card {
-  background: rgba(20, 20, 20, 0.4);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  /* Richer recipe from game_design/code.html's .glass-panel (deeper base, tinted border, an
+     inset glow alongside the outer one) — kept blur at 32px rather than its 64px: with glass-card
+     on every session/problem row (Sessions.tsx, ProblemsTable.tsx can render many at once), a
+     64px backdrop-filter is real compositor cost multiplied by row count, not a one-time cost. */
+  background: rgba(15, 15, 15, 0.45);
+  backdrop-filter: blur(32px);
+  border: 1px solid rgba(219, 252, 255, 0.12);
+  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 .glass-card:hover {
   border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+  box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05), 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+/* Corner "reticle" brackets + a scanline overlay — game_design/code.html's .holo-bracket /
+   .scanlines, used on its code panels and stat cards. Applied here to CodeBlock (see
+   dashboard/components/CodeBlock.tsx); not rolled out to every glass-card, that's a much bigger
+   visual change than "the chat's code looks boring" asked for. */
+.holo-bracket {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: rgba(0, 240, 255, 0.5);
+  border-style: solid;
+  z-index: 20;
+  pointer-events: none;
+}
+.holo-bracket.tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
+.holo-bracket.tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
+.holo-bracket.bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
+.holo-bracket.br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.15));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 10;
 }
 .glow-bar {
   box-shadow: 0 0 8px currentColor;

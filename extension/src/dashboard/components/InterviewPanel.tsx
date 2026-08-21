@@ -4,6 +4,7 @@ import { GeminiProvider } from '../../lib/ai/gemini-provider';
 import { AIProviderError } from '../../lib/ai/types';
 import { CircularTimer } from '../../lib/CircularTimer';
 import { formatTimeAgo } from '../../lib/format';
+import FormattedMessage from './FormattedMessage';
 import type { CoachTarget } from '../../lib/hooks/useCoach';
 import type { InterviewTurn, InterviewEvaluation } from '../../lib/types';
 
@@ -174,7 +175,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
                   </span>
                   <span className="opacity-70 normal-case tracking-normal">{formatTimeAgo(t.at)}</span>
                 </div>
-                <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{t.text}</p>
+                <FormattedMessage text={t.text} />
               </div>
             ))}
             {busy && (

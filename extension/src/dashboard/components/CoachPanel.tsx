@@ -13,6 +13,7 @@ import { CircularTimer } from '../../lib/CircularTimer';
 import { MAX_AUTO_HINT_LEVEL } from '../../lib/ai/intervention';
 import { Skeleton } from './Skeleton';
 import InterviewPanel from './InterviewPanel';
+import FormattedMessage from './FormattedMessage';
 import type { CodingSession, StoredProblem, StoredSubmission, StoredHint } from '../../lib/types';
 
 const JUST_SOLVED_WINDOW_MS = 5 * 60 * 1000;
@@ -293,7 +294,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
                 </span>
                 <span className="text-on-surface-variant/70 normal-case tracking-normal">{formatTimeAgo(h.createdAt)}</span>
               </div>
-              <p className="text-on-surface/90 leading-relaxed whitespace-pre-wrap">{h.text}</p>
+              <FormattedMessage text={h.text} />
             </div>
           </div>
         ))}
