@@ -215,14 +215,22 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
           <h3 className="font-code-md text-lg text-on-surface tracking-tight uppercase flex items-center gap-2">
             <span className="text-electric-blue opacity-70">#</span> {active.problem.title}
           </h3>
-          <span className="font-code-md text-on-surface-variant text-[10px] uppercase tracking-widest">
+          <span className="font-code-md text-[10px] uppercase tracking-widest flex items-center gap-3 flex-wrap">
             {isLive ? (
               <span className="text-neon-green flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" /> on leetcode
               </span>
             ) : (
-              'away'
+              <span className="text-on-surface-variant flex items-center gap-1 opacity-70">
+                <span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant/50" /> away
+              </span>
             )}
+            {active.session.attempts > 0 && (
+              <span className="text-on-surface-variant opacity-70">
+                🔁 {active.session.attempts} attempt{active.session.attempts === 1 ? '' : 's'}
+              </span>
+            )}
+            {hints.length > 0 && <span className="text-on-surface-variant opacity-70">💡 {hints.length} hint{hints.length === 1 ? '' : 's'}</span>}
           </span>
         </div>
         <div className="flex items-center gap-sm">
@@ -243,7 +251,10 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
         </div>
       )}
 
-      <div ref={scrollRef} className="flex flex-col gap-6 max-h-80 overflow-y-auto scroll-smooth pr-1 font-code-md text-sm">
+      <div
+        ref={scrollRef}
+        className="flex flex-col gap-6 max-h-[60vh] min-h-[16rem] overflow-y-auto scroll-smooth pr-1 font-code-md text-sm"
+      >
         {hints.length === 0 && !busy && (
           <div className="chat-block-agent">
             <div className="text-[10px] text-electric-blue mb-1 uppercase tracking-wider opacity-80">
@@ -279,7 +290,9 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
 
       {error && <p className="text-error text-sm font-code-md">{error}</p>}
 
-      <div className="relative flex items-center glass-card border border-white/10 rounded focus-within:border-electric-blue/40 transition-colors">
+      <div
+        className={`relative flex items-center glass-card border border-white/10 rounded focus-within:border-electric-blue/40 transition-colors ${busy ? '' : 'composer-pulse'}`}
+      >
         <span className="absolute left-4 text-electric-blue font-code-md text-sm font-bold opacity-80">&gt;_</span>
         <textarea
           value={question}

@@ -154,7 +154,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
         </div>
       ) : (
         <>
-          <div ref={chatRef} className="flex flex-col gap-4 max-h-80 overflow-y-auto pr-1 font-code-md text-sm">
+          <div ref={chatRef} className="flex flex-col gap-4 max-h-[60vh] min-h-[16rem] overflow-y-auto pr-1 font-code-md text-sm">
             {turns.map((t, i) => (
               <div key={i} className={t.role === 'interviewer' ? 'chat-block-agent' : 'chat-block-user'}>
                 <div className="text-[10px] mb-1 uppercase tracking-wider opacity-80 text-electric-blue">
@@ -168,7 +168,9 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
 
           {error && <p className="text-error text-sm font-code-md">{error}</p>}
 
-          <div className="relative flex items-center glass-card border border-white/10 rounded focus-within:border-electric-blue/40 transition-colors">
+          <div
+            className={`relative flex items-center glass-card border border-white/10 rounded focus-within:border-electric-blue/40 transition-colors ${busy ? '' : 'composer-pulse'}`}
+          >
             <span className="absolute left-4 text-electric-blue font-code-md text-sm font-bold opacity-80">&gt;_</span>
             <textarea
               value={reply}
