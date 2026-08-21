@@ -14,6 +14,7 @@ import Roadmap from './components/Roadmap';
 import ReviewQueue from './components/ReviewQueue';
 import Practice from './components/Practice';
 import DailySummary from './components/DailySummary';
+import RoomBackground from './components/RoomBackground';
 import { Skeleton } from './components/Skeleton';
 
 function rankFor(solved: number): string {
@@ -86,7 +87,8 @@ export default function App() {
   }, [refresh]);
 
   return (
-    <div className="bg-background text-on-surface mesh-bg min-h-screen flex">
+    <div className="text-on-surface min-h-screen flex">
+      <RoomBackground />
       <Sidebar activeView={view} onNavigate={setView} />
       <main className="flex-grow md:ml-64 p-gutter lg:p-margin max-w-[1440px] mx-auto w-full">
         <div className="mb-md flex flex-col md:flex-row justify-between items-start md:items-end gap-sm">
