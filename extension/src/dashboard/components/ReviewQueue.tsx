@@ -99,14 +99,14 @@ export default function ReviewQueue() {
                   onClick={() => void handleOutcome(review.problemKey, false)}
                   className="border border-white/10 text-on-surface-variant font-label-sm rounded-lg px-sm py-xs text-sm disabled:opacity-50 hover:text-on-surface hover:border-white/30 transition-all"
                 >
-                  😵 Forgot
+                  🙀 Forgot
                 </button>
                 <button
                   disabled={busyKey === review.problemKey}
                   onClick={() => void handleOutcome(review.problemKey, true)}
                   className="bg-gradient-to-r from-electric-blue/20 to-soft-violet/20 border border-electric-blue/30 text-electric-blue font-label-sm rounded-lg px-sm py-xs text-sm disabled:opacity-50 hover:from-electric-blue/30 hover:to-soft-violet/30 transition-all"
                 >
-                  ✅ Remembered
+                  😻 Remembered
                 </button>
               </div>
             </div>

@@ -18,11 +18,11 @@ import RoomBackground from './components/RoomBackground';
 import { Skeleton } from './components/Skeleton';
 
 function rankFor(solved: number): string {
-  if (solved >= 100) return 'Elite Coder';
-  if (solved >= 30) return 'Expert Coder';
-  if (solved >= 10) return 'Skilled Coder';
-  if (solved >= 1) return 'Rising Coder';
-  return 'Getting Started';
+  if (solved >= 100) return 'Top Cat';
+  if (solved >= 30) return 'Cool Cat';
+  if (solved >= 10) return 'Clever Kitten';
+  if (solved >= 1) return 'Curious Kitten';
+  return 'New Kitten';
 }
 
 
@@ -99,7 +99,7 @@ export default function App() {
             <p className="font-body-md text-on-surface-variant">Your coding sessions, tracked automatically.</p>
           </div>
           <div className="bg-surface-elevated border border-electric-blue/30 rounded-full px-sm py-xs flex items-center gap-xs shadow-[0_0_10px_rgba(0,240,255,0.2)]">
-            <span className="text-xl">🏆</span>
+            <span className="text-xl">🐱</span>
             <span className="font-label-sm text-label-sm text-electric-blue uppercase">{rankFor(stats.solved)}</span>
           </div>
         </div>

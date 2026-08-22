@@ -21,7 +21,7 @@ export default function Sidebar({ activeView, onNavigate }: SidebarProps) {
       <div className="mb-lg pt-2 flex flex-col items-start border-b border-white/5 pb-sm">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-2 h-2 rounded-full bg-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
-          <h1 className="font-code-md text-sm font-semibold tracking-wider text-on-surface">MEOW MENTOR</h1>
+          <h1 className="font-code-md text-sm font-semibold tracking-wider text-on-surface">🐾 MEOW MENTOR</h1>
         </div>
         <p className="font-code-md text-[10px] text-on-surface-variant uppercase tracking-widest pl-5">
           sys.status: optimal

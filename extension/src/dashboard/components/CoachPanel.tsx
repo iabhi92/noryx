@@ -70,7 +70,7 @@ function TypingBubble() {
   return (
     <div className="chat-block-agent">
       <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
-        <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+        <span className="material-symbols-outlined text-[14px]">pets</span>
         coach.miko
       </div>
       <div className="flex gap-1 items-center">
@@ -266,7 +266,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
         {hints.length === 0 && !busy && (
           <div className="chat-block-agent">
             <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
-              <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+              <span className="material-symbols-outlined text-[14px]">pets</span>
               coach.miko // sys.msg
             </div>
             <p className="text-on-surface/90 leading-relaxed">
@@ -289,7 +289,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
             <div className="chat-block-agent">
               <div className="flex items-center justify-between gap-2 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
                 <span className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                  <span className="material-symbols-outlined text-[14px]">pets</span>
                   coach.miko // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
                   {h.auto ? ' · auto' : ''}
                 </span>

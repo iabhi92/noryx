@@ -149,7 +149,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
           </div>
           <div className="chat-block-agent">
             <span className="flex items-center gap-1.5 text-electric-blue text-[10px] uppercase tracking-wide mb-1.5 opacity-90">
-              <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+              <span className="material-symbols-outlined text-[14px]">pets</span>
               coach.miko // feedback
             </span>
             <p className="text-on-surface/90 text-sm leading-relaxed">{evaluation.summary}</p>
@@ -169,7 +169,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
                 >
                   <span className="flex items-center gap-1.5">
                     <span className="material-symbols-outlined text-[14px]">
-                      {t.role === 'interviewer' ? 'smart_toy' : 'person'}
+                      {t.role === 'interviewer' ? 'pets' : 'person'}
                     </span>
                     {t.role === 'interviewer' ? 'interviewer' : 'you'}
                   </span>
@@ -181,7 +181,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
             {busy && (
               <div className="chat-block-agent">
                 <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
-                  <span className="material-symbols-outlined text-[14px]">smart_toy</span>
+                  <span className="material-symbols-outlined text-[14px]">pets</span>
                   interviewer
                 </div>
                 <span className="text-on-surface-variant text-xs">thinking…</span>

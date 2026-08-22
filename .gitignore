@@ -4,3 +4,4 @@ dist/
 *.log
 safari-app/
 game_design/
+__pycache__/
