@@ -113,6 +113,9 @@ export interface ReviewState {
   box: number;
   dueAt: number;
   lastReviewedAt: number;
+  // Only incremented by recordReviewOutcome, never on initial seeding — lets box === 0 be told
+  // apart as "just solved, never quizzed" (0) vs. "quizzed and actually forgotten" (> 0).
+  timesReviewed: number;
 }
 
 // AI-generated custom problems. args/expected are plain JSON values, positional to

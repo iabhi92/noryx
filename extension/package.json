@@ -12,7 +12,8 @@
     "build": "npm run build:bg && npm run build:cs && npm run build:dashboard && npm run build:assets",
     "typecheck": "tsc --noEmit",
     "icons": "python3 scripts/generate-icons.py",
-    "check:intervention": "esbuild src/lib/ai/intervention.check.ts --bundle --platform=node --format=cjs --outfile=/tmp/meow-mentor-intervention-check.cjs && node /tmp/meow-mentor-intervention-check.cjs"
+    "check:intervention": "esbuild src/lib/ai/intervention.check.ts --bundle --platform=node --format=cjs --outfile=/tmp/meow-mentor-intervention-check.cjs && node /tmp/meow-mentor-intervention-check.cjs",
+    "check:stats": "esbuild src/lib/stats.check.ts --bundle --platform=node --format=cjs --outfile=/tmp/meow-mentor-stats-check.cjs && node /tmp/meow-mentor-stats-check.cjs"
   },
   "dependencies": {
     "react": "^18.3.1",

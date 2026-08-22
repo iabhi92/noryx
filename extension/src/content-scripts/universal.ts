@@ -147,10 +147,20 @@ function watchUrlChanges(onChange: () => void): void {
 
 async function main(): Promise<void> {
   let cleanup = await trackCurrentPage();
+  let generation = 0;
   watchUrlChanges(() => {
     cleanup();
+    // Two rapid navigations can race: an earlier trackCurrentPage() call can resolve after a
+    // later one on a slower page. Without this guard, the earlier call would overwrite `cleanup`
+    // with a stale teardown for a page that's no longer current, leaking its heartbeat and
+    // overlay running alongside the real current page's.
+    const myGeneration = ++generation;
     void trackCurrentPage().then((next) => {
-      cleanup = next;
+      if (myGeneration === generation) {
+        cleanup = next;
+      } else {
+        next();
+      }
     });
   });
 }

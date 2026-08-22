@@ -157,6 +157,7 @@ export async function recordSubmission(problemKey: string, submission: Submissio
         box: 0,
         dueAt: Date.now() + REVIEW_INTERVAL_DAYS[0] * DAY_MS,
         lastReviewedAt: Date.now(),
+        timesReviewed: 0,
       };
       await setMap(KEYS.reviews, reviews);
     }
@@ -241,6 +242,7 @@ export async function recordReviewOutcome(problemKey: string, remembered: boolea
     box: nextBox,
     dueAt: Date.now() + REVIEW_INTERVAL_DAYS[nextBox] * DAY_MS,
     lastReviewedAt: Date.now(),
+    timesReviewed: (reviews[problemKey]?.timesReviewed ?? 0) + 1,
   };
   reviews[problemKey] = updated;
   await setMap(KEYS.reviews, reviews);
@@ -305,7 +307,7 @@ export async function getLearnerProfileContext(): Promise<LearnerProfileContext>
     .filter((item): item is LearnerProfileHistoryItem => item !== null);
 
   const recentlyForgotten = Object.values(reviews)
-    .filter((r) => r.box === 0)
+    .filter((r) => r.box === 0 && r.timesReviewed > 0)
     .map((r) => problems[r.problemKey]?.title)
     .filter((title): title is string => !!title);
 

@@ -5,8 +5,14 @@ import type { CodingSession } from './types';
 export function computeStreak(sessions: CodingSession[]): number {
   if (sessions.length === 0) return 0;
   const days = new Set(sessions.map((s) => new Date(s.startedAt).toDateString()));
-  let streak = 0;
   const cursor = new Date();
+  // Today not having a session yet doesn't break the streak until yesterday is also missing —
+  // otherwise a real ongoing streak reads as 0 every morning before the user solves anything.
+  if (!days.has(cursor.toDateString())) {
+    cursor.setDate(cursor.getDate() - 1);
+    if (!days.has(cursor.toDateString())) return 0;
+  }
+  let streak = 0;
   while (days.has(cursor.toDateString())) {
     streak += 1;
     cursor.setDate(cursor.getDate() - 1);
