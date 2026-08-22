@@ -48,7 +48,7 @@ function buildPrompt(context: HintContext): string {
   const code = latest?.code;
 
   return [
-    'You are Noryx, an AI coding tutor. Your job is to make the user a better independent problem',
+    'You are Miko, an AI coding tutor. Your job is to make the user a better independent problem',
     'solver — you are NOT a coding agent. Never write code unless explicitly told to below.',
     '',
     `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
@@ -88,7 +88,7 @@ function buildRoadmapPrompt(context: ProgressContext): string {
       .join(', ') || '(none tracked)';
 
   return [
-    'You are Noryx, an AI coding tutor building a short personalized DSA practice roadmap for this',
+    'You are Miko, an AI coding tutor building a short personalized DSA practice roadmap for this',
     'user, based only on the real activity below — never invent specific problems or stats not',
     'given here. If the history is thin, say so plainly and lean on general beginner-appropriate',
     "progression advice instead of pretending to see patterns that aren't really there.",
@@ -105,7 +105,7 @@ function buildRoadmapPrompt(context: ProgressContext): string {
 }
 
 const INTERVIEWER_ROLE =
-  'You are Noryx, roleplaying as a friendly-but-real technical interviewer. Never write or fix ' +
+  'You are Miko, roleplaying as a friendly-but-real technical interviewer. Never write or fix ' +
   "code, never reveal the algorithm outright — a real interviewer wouldn't. Keep every message " +
   'short (2-3 sentences max) and conversational, like real interview dialogue.';
 
@@ -153,7 +153,7 @@ function buildInterviewEvalPrompt(context: InterviewContext): string {
   const solved = submissions.some((s) => s.status === 'Accepted');
 
   return [
-    'You are Noryx, evaluating a completed mock technical interview. Score honestly based only on',
+    'You are Miko, evaluating a completed mock technical interview. Score honestly based only on',
     'the transcript and outcome below — never invent details not present here.',
     '',
     `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
@@ -168,7 +168,7 @@ function buildInterviewEvalPrompt(context: InterviewContext): string {
 
 function buildPracticeProblemPrompt(topic: string, difficulty: string): string {
   return [
-    'You are Noryx, generating an original DSA practice problem (not a copy of a known',
+    'You are Miko, generating an original DSA practice problem (not a copy of a known',
     "LeetCode/Codeforces/etc. problem) for a user practicing a specific topic.",
     '',
     `Topic focus: ${topic}`,
@@ -212,7 +212,7 @@ function buildLearnerProfilePrompt(context: LearnerProfileContext): string {
     : '  (no scored mock interviews yet)';
 
   return [
-    'You are Noryx, synthesizing a learner profile from a coding practice history. This profile',
+    'You are Miko, synthesizing a learner profile from a coding practice history. This profile',
     "gets fed back into every future hint, so it needs to be genuinely useful, specific, and true",
     'to the data below — never invent a pattern, topic weakness, or mistake type that the evidence',
     "doesn't actually support. If the history is too thin to say something real, say that plainly",
@@ -261,7 +261,7 @@ export class GeminiProvider implements HintProvider {
     }
 
     if (response.status === 401 || response.status === 403) {
-      throw new AIProviderError("Gemini rejected the API key — check it in Noryx's settings.");
+      throw new AIProviderError("Gemini rejected the API key — check it in Settings.");
     }
     if (response.status === 429) {
       throw new AIProviderError('Gemini rate limit hit — try again in a bit.');

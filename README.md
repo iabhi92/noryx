@@ -1,4 +1,4 @@
-# Noryx
+# Meow Mentor
 
 Your AI coding coach: a Safari Web Extension that watches you solve problems on coding platforms
 and coaches you — hints, questions, pattern recognition — without writing the solution for you.
@@ -46,7 +46,7 @@ request behind a warning.
   interruption."
 - Manual hints and the hint history live in the dashboard's Coach panel, not a new nav page (no
   router exists yet — it's a section on the one dashboard view).
-- Deliberately not in this pass: the in-page floating "Noryx Coach" overlay (PRD §15) — the surface
+- Deliberately not in this pass: the in-page floating "Meow Mentor Coach" overlay (PRD §15) — the surface
   today is the dashboard + notifications, not an overlay injected into the coding-platform page.
   Also not sent to the model: your actual code (only problem metadata + submission-status history)
   — levels 1-3 are about approach, not code review, so this holds up without it; code-aware hints
@@ -150,7 +150,7 @@ npm run typecheck
    Safari → Settings → Advanced → "Show features for web developers", then
    Develop → "Allow Unsigned Extensions".
 4. Open a problem page on any supported site (e.g. `leetcode.com/problems/...`). A session should
-   start automatically. Submit a solution, then click the Noryx toolbar icon to see it show up in
+   start automatically. Submit a solution, then click the Meow Mentor toolbar icon to see it show up in
    the dashboard.
 
 ## Known limitations (by design, for this milestone)

@@ -203,7 +203,7 @@ export default function Roadmap({ onOpenSettings }: RoadmapProps) {
           </>
         ) : (
           <p className="text-on-surface-variant text-sm">
-            Ask Noryx for a personalized set of focus areas based on what you've tracked so far.
+            Ask Miko for a personalized set of focus areas based on what you've tracked so far.
             {context && context.totalAttempted < 5 && (
               <> Heads up — with this little history, it&rsquo;ll lean on general beginner-friendly guidance rather than personal patterns.</>
             )}

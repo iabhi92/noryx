@@ -20,7 +20,7 @@ async function rpc(fn: string, body: Record<string, unknown>): Promise<void> {
 }
 
 export function shareUrlFor(id: string): string {
-  return `https://iabhi92.github.io/noryx/u.html?id=${id}`;
+  return `https://iabhi92.github.io/meow-mentor/u.html?id=${id}`;
 }
 
 /** One opaque string carrying {id, writeToken} for the VS Code extension's "Set Sync Code"

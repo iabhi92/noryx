@@ -190,7 +190,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
     return (
       <div className="bubble-wrap">
         <RingBadge elapsedMs={session?.activeMs ?? 0} isLive={isLive} size={64}>
-          <button className="bubble-btn" onClick={() => setExpanded(true)} aria-label="Open Noryx coach" title="Open Noryx coach">
+          <button className="bubble-btn" onClick={() => setExpanded(true)} aria-label="Open Miko" title="Open Miko">
             🤖
             {hints.length > 0 && <span className="badge">{hints.length}</span>}
           </button>
@@ -234,14 +234,14 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
 
       {!apiKey ? (
         <div className="empty" style={{ padding: 12 }}>
-          Add a free Gemini API key in the Noryx dashboard's Settings to enable coaching here.
+          Add a free Gemini API key in the Meow Mentor dashboard's Settings to enable coaching here.
         </div>
       ) : (
         <>
           <div className="chat" ref={chatRef}>
             {hints.length === 0 && !busy && (
               <div className="chat-block-agent">
-                <span className="msg-label agent">coach.noryx // sys.msg</span>
+                <span className="msg-label agent">coach.miko // sys.msg</span>
                 <div className="msg-text">Stuck, or want to talk through your approach? Ask below.</div>
               </div>
             )}
@@ -255,7 +255,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
                 )}
                 <div className="chat-block-agent">
                   <span className="msg-label agent">
-                    coach.noryx // {h.level === 'solution' ? 'solution' : `level ${h.level}`}
+                    coach.miko // {h.level === 'solution' ? 'solution' : `level ${h.level}`}
                     {h.auto ? ' · auto' : ''}
                   </span>
                   <div className="msg-text">{h.text}</div>
@@ -305,7 +305,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
  *  (universal.ts's SPA-navigation handling) can tear it down cleanly before the next problem. */
 export function mountOverlay(problemKey: string, problem: Problem & ProblemMetadata): () => void {
   const host = document.createElement('div');
-  host.id = 'noryx-overlay-host';
+  host.id = 'meow-mentor-overlay-host';
   document.documentElement.appendChild(host);
   const shadow = host.attachShadow({ mode: 'open' });
   const styleEl = document.createElement('style');

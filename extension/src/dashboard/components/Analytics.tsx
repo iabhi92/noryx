@@ -215,7 +215,7 @@ export default function Analytics() {
         {topicStats.length === 0 ? (
           <p className="text-on-surface-variant text-sm">
             No topic data yet — most platforms don't expose a problem's topics until you're
-            already solving it (only Codeforces currently does, of the ones Noryx tracks). This
+            already solving it (only Codeforces currently does, of the ones Meow Mentor tracks). This
             fills in as you solve tagged problems there.
           </p>
         ) : (

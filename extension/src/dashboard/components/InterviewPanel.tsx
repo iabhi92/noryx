@@ -150,7 +150,7 @@ export default function InterviewPanel({ apiKey, active, onExit }: InterviewPane
           <div className="chat-block-agent">
             <span className="flex items-center gap-1.5 text-electric-blue text-[10px] uppercase tracking-wide mb-1.5 opacity-90">
               <span className="material-symbols-outlined text-[14px]">smart_toy</span>
-              coach.noryx // feedback
+              coach.miko // feedback
             </span>
             <p className="text-on-surface/90 text-sm leading-relaxed">{evaluation.summary}</p>
           </div>

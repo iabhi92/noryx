@@ -70,7 +70,7 @@ function TypingBubble() {
     <div className="chat-block-agent">
       <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
         <span className="material-symbols-outlined text-[14px]">smart_toy</span>
-        coach.noryx
+        coach.miko
       </div>
       <div className="flex gap-1 items-center">
         {[0, 1, 2].map((i) => (
@@ -184,7 +184,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
       <div className="glass-card rounded-xl p-sm mb-md flex flex-col gap-xs">
         <h3 className="font-code-md text-sm uppercase tracking-wider text-on-surface">// connect_gemini</h3>
         <p className="text-on-surface-variant text-sm">
-          Noryx nudges you with hints while you're stuck — it needs a free Gemini API key to do
+          Miko nudges you with hints while you're stuck — it needs a free Gemini API key to do
           that. Add one in Settings.
         </p>
         <button
@@ -266,7 +266,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
           <div className="chat-block-agent">
             <div className="flex items-center gap-1.5 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
               <span className="material-symbols-outlined text-[14px]">smart_toy</span>
-              coach.noryx // sys.msg
+              coach.miko // sys.msg
             </div>
             <p className="text-on-surface/90 leading-relaxed">
               Stuck, or just want to talk through your approach? Ask below — I won't write the
@@ -289,7 +289,7 @@ export default function CoachPanel({ onOpenSettings }: CoachPanelProps) {
               <div className="flex items-center justify-between gap-2 text-[10px] text-electric-blue mb-1.5 uppercase tracking-wider opacity-90">
                 <span className="flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[14px]">smart_toy</span>
-                  coach.noryx // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
+                  coach.miko // {h.level === 'solution' ? 'solution' : LEVEL_LABEL[h.level].toLowerCase()}
                   {h.auto ? ' · auto' : ''}
                 </span>
                 <span className="text-on-surface-variant/70 normal-case tracking-normal">{formatTimeAgo(h.createdAt)}</span>

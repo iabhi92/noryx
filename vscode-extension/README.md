@@ -1,8 +1,8 @@
-# Noryx — AI Coding Coach (VS Code)
+# Meow Mentor — AI Coding Coach (VS Code)
 
 Tracks active coding time in this VS Code window (a status bar item, local only by
 default) and, if you connect it, syncs that time into the same public profile as the
-[Noryx Safari extension](../extension) — so a link you share for a resume shows both
+[Meow Mentor Safari extension](../extension) — so a link you share for a resume shows both
 platform-solving time and local practice time under one identity.
 
 ## What it tracks
@@ -15,15 +15,15 @@ session metadata, not content.
 
 ## Connecting to your public profile (optional)
 
-1. In the Noryx dashboard (Safari extension) → Settings → Public profile, enable the
+1. In the Meow Mentor dashboard (Safari extension) → Settings → Public profile, enable the
    public profile if you haven't, then copy the **sync code** shown there.
-2. In VS Code, run **Noryx: Set Sync Code** from the Command Palette and paste it in.
+2. In VS Code, run **Meow Mentor: Set Sync Code** from the Command Palette and paste it in.
    It's stored in VS Code's encrypted secret storage, not plain settings.
 3. Every 5 minutes, accumulated active time since the last sync is sent as a single
    millisecond delta to the same Supabase row your public profile already lives in —
    nothing else about this window is ever sent.
 
-Run **Noryx: Clear Sync Code** to stop syncing; time tracking keeps working locally.
+Run **Meow Mentor: Clear Sync Code** to stop syncing; time tracking keeps working locally.
 
 The public-profile side of this requires `supabase/vscode_sync_migration.sql` to have
 been run once against the project (adds one column + one function, safe to run

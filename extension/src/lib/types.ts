@@ -74,7 +74,10 @@ export type HintLevel = 1 | 2 | 3 | 4;
 export interface StoredHint {
   id: string;
   sessionId: string;
-  level: HintLevel | 'solution';
+  // 'review' is never requested through the normal level progression (see HintContext['level'],
+  // unchanged) — it's a distinct automatic-only trigger fired on an Accepted submission (see
+  // maybeReviewSolution in background/index.ts), stored and rendered through the same hint feed.
+  level: HintLevel | 'solution' | 'review';
   text: string;
   createdAt: number;
   auto: boolean; // proactive intervention vs. user-clicked "Ask for a hint"

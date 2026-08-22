@@ -27,7 +27,7 @@ export default function RoomBackground() {
 
   return (
     <div className="room-bg-layer" aria-hidden="true">
-      <div className="house" id="noryx-room-house" ref={houseRef}>
+      <div className="house" id="meow-mentor-room-house" ref={houseRef}>
             <div className="h-lights">
               <div className="h-light" />
               <div className="h-light" />

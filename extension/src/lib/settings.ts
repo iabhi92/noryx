@@ -1,6 +1,6 @@
-const SETTINGS_KEY = 'noryx:settings';
+const SETTINGS_KEY = 'meowmentor:settings';
 
-export interface NoryxSettings {
+export interface MeowMentorSettings {
   geminiApiKey?: string;
   publicProfile?: { id: string; writeToken: string };
   // Opt-in, default off: lets the content script read your editor's code so the AI coach can give
@@ -10,12 +10,12 @@ export interface NoryxSettings {
   captureCode?: boolean;
 }
 
-export async function getSettings(): Promise<NoryxSettings> {
+export async function getSettings(): Promise<MeowMentorSettings> {
   const result = await chrome.storage.local.get(SETTINGS_KEY);
-  return (result[SETTINGS_KEY] as NoryxSettings) ?? {};
+  return (result[SETTINGS_KEY] as MeowMentorSettings) ?? {};
 }
 
-export async function saveSettings(settings: NoryxSettings): Promise<void> {
+export async function saveSettings(settings: MeowMentorSettings): Promise<void> {
   const current = await getSettings();
   await chrome.storage.local.set({ [SETTINGS_KEY]: { ...current, ...settings } });
 }

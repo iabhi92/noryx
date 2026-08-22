@@ -1,5 +1,5 @@
 {
-  "name": "noryx-extension",
+  "name": "meow-mentor-extension",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -12,7 +12,7 @@
     "build": "npm run build:bg && npm run build:cs && npm run build:dashboard && npm run build:assets",
     "typecheck": "tsc --noEmit",
     "icons": "python3 scripts/generate-icons.py",
-    "check:intervention": "esbuild src/lib/ai/intervention.check.ts --bundle --platform=node --format=cjs --outfile=/tmp/noryx-intervention-check.cjs && node /tmp/noryx-intervention-check.cjs"
+    "check:intervention": "esbuild src/lib/ai/intervention.check.ts --bundle --platform=node --format=cjs --outfile=/tmp/meow-mentor-intervention-check.cjs && node /tmp/meow-mentor-intervention-check.cjs"
   },
   "dependencies": {
     "react": "^18.3.1",

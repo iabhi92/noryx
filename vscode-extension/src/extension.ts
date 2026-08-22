@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-const SYNC_CODE_SECRET_KEY = 'noryx.syncCode';
+const SYNC_CODE_SECRET_KEY = 'meowmentor.syncCode';
 const TICK_INTERVAL_MS = 15_000;
 const SYNC_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -35,8 +35,8 @@ function formatActiveTime(ms: number): string {
 
 export function activate(context: vscode.ExtensionContext): void {
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBar.name = 'Noryx';
-  statusBar.tooltip = 'Active coding time tracked by Noryx in this VS Code window.';
+  statusBar.name = 'Meow Mentor';
+  statusBar.tooltip = 'Active coding time tracked by Meow Mentor in this VS Code window.';
   statusBar.show();
   context.subscriptions.push(statusBar);
 
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): void {
   let lastTick = Date.now();
 
   const updateStatusBar = () => {
-    statusBar.text = `$(watch) Noryx ${formatActiveTime(activeMs)}`;
+    statusBar.text = `$(watch) Meow Mentor ${formatActiveTime(activeMs)}`;
   };
   updateStatusBar();
 
@@ -90,7 +90,7 @@ export function activate(context: vscode.ExtensionContext): void {
       });
       if (!res.ok) throw new Error(`sync failed (${res.status})`);
     } catch (err) {
-      console.warn('[Noryx] sync failed:', err);
+      console.warn('[Meow Mentor] sync failed:', err);
     }
   }
 
@@ -102,25 +102,25 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push({ dispose: () => void flushSync() });
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('noryx.setSyncCode', async () => {
+    vscode.commands.registerCommand('meowmentor.setSyncCode', async () => {
       const input = await vscode.window.showInputBox({
-        prompt: 'Paste the sync code from Noryx → Settings → Public Profile (in your browser)',
+        prompt: 'Paste the sync code from Meow Mentor → Settings → Public Profile (in your browser)',
         password: true,
         ignoreFocusOut: true,
-        validateInput: (value) => (decodeSyncCode(value) ? null : "That doesn't look like a valid Noryx sync code."),
+        validateInput: (value) => (decodeSyncCode(value) ? null : "That doesn't look like a valid Meow Mentor sync code."),
       });
       if (!input) return;
       await context.secrets.store(SYNC_CODE_SECRET_KEY, input.trim());
       void vscode.window.showInformationMessage(
-        'Noryx: sync code saved — VS Code time now counts toward your public profile.',
+        'Meow Mentor: sync code saved — VS Code time now counts toward your public profile.',
       );
     }),
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('noryx.clearSyncCode', async () => {
+    vscode.commands.registerCommand('meowmentor.clearSyncCode', async () => {
       await context.secrets.delete(SYNC_CODE_SECRET_KEY);
-      void vscode.window.showInformationMessage('Noryx: sync code removed — VS Code time stays local only.');
+      void vscode.window.showInformationMessage('Meow Mentor: sync code removed — VS Code time stays local only.');
     }),
   );
 }

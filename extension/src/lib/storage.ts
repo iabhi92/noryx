@@ -17,15 +17,15 @@ import type {
 import type { ProgressInsight, LearnerProfileContext, LearnerProfileHistoryItem } from './ai/types';
 
 const KEYS = {
-  problems: 'noryx:problems',
-  sessions: 'noryx:sessions',
-  submissions: 'noryx:submissions',
-  hints: 'noryx:hints',
-  roadmap: 'noryx:roadmap',
-  interviews: 'noryx:interviews',
-  reviews: 'noryx:reviews',
-  practiceProblem: 'noryx:practiceProblem',
-  learnerProfile: 'noryx:learnerProfile',
+  problems: 'meowmentor:problems',
+  sessions: 'meowmentor:sessions',
+  submissions: 'meowmentor:submissions',
+  hints: 'meowmentor:hints',
+  roadmap: 'meowmentor:roadmap',
+  interviews: 'meowmentor:interviews',
+  reviews: 'meowmentor:reviews',
+  practiceProblem: 'meowmentor:practiceProblem',
+  learnerProfile: 'meowmentor:learnerProfile',
 } as const;
 
 // Leitner boxes: index = box number, value = days until next due. Correct recall advances a

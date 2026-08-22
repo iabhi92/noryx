@@ -1,9 +1,9 @@
 {
-  "name": "noryx-coach",
-  "displayName": "Noryx — AI Coding Coach",
-  "description": "Tracks active coding time in VS Code and, optionally, syncs it into the same public profile as the Noryx Safari extension.",
+  "name": "meow-mentor-coach",
+  "displayName": "Meow Mentor — AI Coding Coach",
+  "description": "Tracks active coding time in VS Code and, optionally, syncs it into the same public profile as the Meow Mentor Safari extension.",
   "version": "0.1.0",
-  "publisher": "noryx",
+  "publisher": "meow-mentor",
   "private": true,
   "engines": {
     "vscode": "^1.85.0"
@@ -13,8 +13,8 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      { "command": "noryx.setSyncCode", "title": "Noryx: Set Sync Code" },
-      { "command": "noryx.clearSyncCode", "title": "Noryx: Clear Sync Code" }
+      { "command": "meowmentor.setSyncCode", "title": "Meow Mentor: Set Sync Code" },
+      { "command": "meowmentor.clearSyncCode", "title": "Meow Mentor: Clear Sync Code" }
     ]
   },
   "scripts": {

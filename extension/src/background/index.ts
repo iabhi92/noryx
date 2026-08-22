@@ -29,7 +29,7 @@ async function maybeSyncPublicProfile(): Promise<void> {
   try {
     await syncPublicProfile();
   } catch (err) {
-    console.warn('[Noryx] public profile sync failed:', err);
+    console.warn('[Meow Mentor] public profile sync failed:', err);
   }
 }
 
@@ -42,12 +42,12 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
 // though nothing's actually broken. This alarm re-syncs on a fixed cadence regardless of activity
 // (syncPublicProfile() itself still no-ops without an enabled profile), so the link stays
 // current-looking for whoever has it, not just fresh right after a coding session.
-const PROFILE_SYNC_ALARM = 'noryx-profile-sync';
+const PROFILE_SYNC_ALARM = 'meow-mentor-profile-sync';
 if (chrome.alarms) {
   chrome.alarms.create(PROFILE_SYNC_ALARM, { periodInMinutes: 15 });
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name !== PROFILE_SYNC_ALARM) return;
-    void syncPublicProfile().catch((err) => console.warn('[Noryx] public profile sync failed:', err));
+    void syncPublicProfile().catch((err) => console.warn('[Meow Mentor] public profile sync failed:', err));
   });
 }
 
@@ -129,17 +129,17 @@ async function maybeIntervene(key: string): Promise<void> {
     // Safari's WebExtension implementation doesn't have chrome.notifications — the hint is
     // still stored via addHint() above, and now badged, just not shown as a system notification.
     if (chrome.notifications) {
-      chrome.notifications.create(`noryx-hint-${session.id}-${now}`, {
+      chrome.notifications.create(`meow-mentor-hint-${session.id}-${now}`, {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-        title: `Noryx · ${problem.title}`,
+        title: `Meow Mentor · ${problem.title}`,
         message: hint.text,
       });
     }
   } catch (err) {
     // Conservative-by-design: a failed hint (bad key, rate limit, network) should never crash
     // the service worker or block tracking. It just quietly doesn't nudge this time.
-    console.warn('[Noryx] hint generation failed:', err);
+    console.warn('[Meow Mentor] hint generation failed:', err);
   }
 }
 
@@ -167,7 +167,7 @@ async function maybeUpdateLearnerProfile(): Promise<void> {
   } catch (err) {
     // Same rule as maybeIntervene: a failed synthesis (bad key, rate limit, malformed response)
     // never blocks tracking — hints just keep using whatever profile (or none) already existed.
-    console.warn('[Noryx] learner profile synthesis failed:', err);
+    console.warn('[Meow Mentor] learner profile synthesis failed:', err);
   }
 }
 
