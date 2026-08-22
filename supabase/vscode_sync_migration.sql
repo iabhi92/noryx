@@ -4,7 +4,7 @@
 -- table without touching existing rows.
 --
 -- Backs "cross-editor identity": the same id/write_token pair that unlocks writes from the Safari
--- extension (see sync_profile in public_profile.sql) now also accepts writes from the Meow Mentor VS
+-- extension (see sync_profile in public_profile.sql) now also accepts writes from the MeowMentor VS
 -- Code extension, so time spent coding locally counts toward the same public profile.
 
 alter table public_profiles add column if not exists vscode_active_ms bigint not null default 0;

@@ -55,7 +55,7 @@ const LEGACY_KEY_PAIRS: Array<[string, string]> = [
   ['noryx:settings', 'meowmentor:settings'],
 ];
 
-// Recovers data recorded before the Noryx -> Meow Mentor rename moved every storage key to a new
+// Recovers data recorded before the Noryx -> MeowMentor rename moved every storage key to a new
 // prefix, so it stops looking erased under the new key names. Idempotent: once a new key holds
 // data, its legacy pair is skipped, so this is cheap to call unconditionally on every startup.
 export async function migrateLegacyStorageKeys(): Promise<void> {
@@ -73,7 +73,7 @@ export async function migrateLegacyStorageKeys(): Promise<void> {
   }
   if (Object.keys(toSet).length > 0) {
     await chrome.storage.local.set(toSet);
-    console.info('[Meow Mentor] recovered local data from pre-rename storage keys:', Object.keys(toSet));
+    console.info('[MeowMentor] recovered local data from pre-rename storage keys:', Object.keys(toSet));
   }
 }
 

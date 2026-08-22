@@ -26,7 +26,7 @@ grant select on public_profiles to anon;
 
 -- Deliberately NOT granting insert/update/delete to anon on the table itself. All writes go
 -- through these SECURITY DEFINER functions instead, which check write_token before touching a
--- row. Every Meow Mentor install shares the same public anon key, so without this, any installation
+-- row. Every MeowMentor install shares the same public anon key, so without this, any installation
 -- could overwrite or delete any other user's public profile.
 
 create or replace function create_profile(p_id uuid, p_write_token uuid)

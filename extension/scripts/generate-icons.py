@@ -4,7 +4,7 @@ transparency, Electric Blue RGBA PNG.
 Safari renders WebExtension toolbar icons as monochrome template silhouettes — it uses the
 alpha channel as a mask and paints it black/white to match the toolbar. The shape is a circle
 (head) unioned with two triangles (ears) so the silhouette actually reads as a cat, not a plain
-dot — Meow Mentor's mark, not a placeholder. 3x3 supersampling per pixel for anti-aliased edges,
+dot — MeowMentor's mark, not a placeholder. 3x3 supersampling per pixel for anti-aliased edges,
 since the ear triangles have angled edges that look rough at 16px without it.
 """
 import os

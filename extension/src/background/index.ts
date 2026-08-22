@@ -30,7 +30,7 @@ async function maybeSyncPublicProfile(): Promise<void> {
   try {
     await syncPublicProfile();
   } catch (err) {
-    console.warn('[Meow Mentor] public profile sync failed:', err);
+    console.warn('[MeowMentor] public profile sync failed:', err);
   }
 }
 
@@ -50,7 +50,7 @@ if (chrome.alarms) {
   chrome.alarms.create(PROFILE_SYNC_ALARM, { periodInMinutes: 15 });
   chrome.alarms.onAlarm.addListener((alarm) => {
     if (alarm.name !== PROFILE_SYNC_ALARM) return;
-    void syncPublicProfile().catch((err) => console.warn('[Meow Mentor] public profile sync failed:', err));
+    void syncPublicProfile().catch((err) => console.warn('[MeowMentor] public profile sync failed:', err));
   });
 }
 
@@ -136,14 +136,14 @@ async function maybeIntervene(key: string): Promise<void> {
       chrome.notifications.create(`meow-mentor-hint-${session.id}-${now}`, {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-        title: `Meow Mentor · ${problem.title}`,
+        title: `MeowMentor · ${problem.title}`,
         message: hint.text,
       });
     }
   } catch (err) {
     // Conservative-by-design: a failed hint (bad key, rate limit, network) should never crash
     // the service worker or block tracking. It just quietly doesn't nudge this time.
-    console.warn('[Meow Mentor] hint generation failed:', err);
+    console.warn('[MeowMentor] hint generation failed:', err);
   }
 }
 
@@ -177,13 +177,13 @@ async function maybeReviewSolution(key: string, submission: SubmissionEvent): Pr
       chrome.notifications.create(`meow-mentor-review-${session.id}-${now}`, {
         type: 'basic',
         iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-        title: `Meow Mentor · ${problem.title}`,
+        title: `MeowMentor · ${problem.title}`,
         message: hint.text,
       });
     }
   } catch (err) {
     // Same rule as maybeIntervene: never let a failed review call crash tracking.
-    console.warn('[Meow Mentor] solution review failed:', err);
+    console.warn('[MeowMentor] solution review failed:', err);
   }
 }
 
@@ -211,7 +211,7 @@ async function maybeUpdateLearnerProfile(): Promise<void> {
   } catch (err) {
     // Same rule as maybeIntervene: a failed synthesis (bad key, rate limit, malformed response)
     // never blocks tracking — hints just keep using whatever profile (or none) already existed.
-    console.warn('[Meow Mentor] learner profile synthesis failed:', err);
+    console.warn('[MeowMentor] learner profile synthesis failed:', err);
   }
 }
 

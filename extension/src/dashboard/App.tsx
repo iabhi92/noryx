@@ -94,7 +94,7 @@ export default function App() {
         <div className="mb-md flex flex-col md:flex-row justify-between items-start md:items-end gap-sm">
           <div>
             <h1 className="font-display text-headline-lg-mobile md:text-display text-on-surface mb-1">
-              <span className="text-gradient">Meow Mentor</span>
+              <span className="text-gradient">MeowMentor</span>
             </h1>
             <p className="font-body-md text-on-surface-variant">Your coding sessions, tracked automatically.</p>
           </div>

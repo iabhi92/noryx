@@ -35,8 +35,8 @@ function formatActiveTime(ms: number): string {
 
 export function activate(context: vscode.ExtensionContext): void {
   const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
-  statusBar.name = 'Meow Mentor';
-  statusBar.tooltip = 'Active coding time tracked by Meow Mentor in this VS Code window.';
+  statusBar.name = 'MeowMentor';
+  statusBar.tooltip = 'Active coding time tracked by MeowMentor in this VS Code window.';
   statusBar.show();
   context.subscriptions.push(statusBar);
 
@@ -50,7 +50,7 @@ export function activate(context: vscode.ExtensionContext): void {
   let lastTick = Date.now();
 
   const updateStatusBar = () => {
-    statusBar.text = `$(watch) Meow Mentor ${formatActiveTime(activeMs)}`;
+    statusBar.text = `$(watch) MeowMentor ${formatActiveTime(activeMs)}`;
   };
   updateStatusBar();
 
@@ -90,7 +90,7 @@ export function activate(context: vscode.ExtensionContext): void {
       });
       if (!res.ok) throw new Error(`sync failed (${res.status})`);
     } catch (err) {
-      console.warn('[Meow Mentor] sync failed:', err);
+      console.warn('[MeowMentor] sync failed:', err);
     }
   }
 
@@ -104,15 +104,15 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('meowmentor.setSyncCode', async () => {
       const input = await vscode.window.showInputBox({
-        prompt: 'Paste the sync code from Meow Mentor → Settings → Public Profile (in your browser)',
+        prompt: 'Paste the sync code from MeowMentor → Settings → Public Profile (in your browser)',
         password: true,
         ignoreFocusOut: true,
-        validateInput: (value) => (decodeSyncCode(value) ? null : "That doesn't look like a valid Meow Mentor sync code."),
+        validateInput: (value) => (decodeSyncCode(value) ? null : "That doesn't look like a valid MeowMentor sync code."),
       });
       if (!input) return;
       await context.secrets.store(SYNC_CODE_SECRET_KEY, input.trim());
       void vscode.window.showInformationMessage(
-        'Meow Mentor: sync code saved — VS Code time now counts toward your public profile.',
+        'MeowMentor: sync code saved — VS Code time now counts toward your public profile.',
       );
     }),
   );
@@ -120,7 +120,7 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     vscode.commands.registerCommand('meowmentor.clearSyncCode', async () => {
       await context.secrets.delete(SYNC_CODE_SECRET_KEY);
-      void vscode.window.showInformationMessage('Meow Mentor: sync code removed — VS Code time stays local only.');
+      void vscode.window.showInformationMessage('MeowMentor: sync code removed — VS Code time stays local only.');
     }),
   );
 }

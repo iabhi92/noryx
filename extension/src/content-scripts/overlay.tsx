@@ -234,7 +234,7 @@ function OverlayApp({ problemKey, problem }: OverlayAppProps) {
 
       {!apiKey ? (
         <div className="empty" style={{ padding: 12 }}>
-          Add a free Gemini API key in the Meow Mentor dashboard's Settings to enable coaching here.
+          Add a free Gemini API key in the MeowMentor dashboard's Settings to enable coaching here.
         </div>
       ) : (
         <>

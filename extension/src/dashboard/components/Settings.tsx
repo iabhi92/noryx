@@ -38,7 +38,7 @@ export default function Settings() {
 
   async function handleClearData() {
     const confirmed = window.confirm(
-      'This deletes every problem, session, submission, and hint Meow Mentor has tracked locally. This cannot be undone. Continue?',
+      'This deletes every problem, session, submission, and hint MeowMentor has tracked locally. This cannot be undone. Continue?',
     );
     if (!confirmed) return;
     await chrome.storage.local.clear();
@@ -156,7 +156,7 @@ export default function Settings() {
               <div className="flex flex-col gap-xs border-t border-white/5 pt-xs mt-xs">
                 <p className="text-on-surface-variant text-xs">
                   🖥️ Also coding in VS Code? Paste this into the{' '}
-                  <span className="text-on-surface">Meow Mentor: Set Sync Code</span> command there to count that time
+                  <span className="text-on-surface">MeowMentor: Set Sync Code</span> command there to count that time
                   toward this same profile — nothing else about your VS Code activity is ever read.
                 </p>
                 <div className="flex gap-xs flex-wrap items-center">
@@ -194,7 +194,7 @@ export default function Settings() {
       <div className="glass-card rounded-xl p-sm flex flex-col gap-xs">
         <h3 className="font-headline-md text-body-lg font-bold text-on-surface">// code_analysis</h3>
         <p className="text-on-surface-variant text-sm">
-          Off by default: Meow Mentor only sees your submission's status ("Wrong Answer"), never the
+          Off by default: MeowMentor only sees your submission's status ("Wrong Answer"), never the
           code. Turn this on and it can read your editor's code when you submit, so hints get
           grounded in what you actually wrote instead of generic status-based nudges. That code
           goes to Gemini (same boundary as the API key above) and is stored locally alongside the
@@ -215,7 +215,7 @@ export default function Settings() {
       <div className="glass-card rounded-xl p-sm flex flex-col gap-xs">
         <h3 className="font-headline-md text-body-lg font-bold text-on-surface">Local data</h3>
         <p className="text-on-surface-variant text-sm">
-          Everything Meow Mentor tracks — problems, sessions, submissions, hints — lives only in this
+          Everything MeowMentor tracks — problems, sessions, submissions, hints — lives only in this
           browser's local storage. It's never sent anywhere except: the aggregate counts synced
           for the public profile above (if enabled), and your code going to Gemini for hint
           generation (only if code analysis above is enabled).

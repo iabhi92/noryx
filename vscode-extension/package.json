@@ -1,7 +1,7 @@
 {
   "name": "meow-mentor-coach",
-  "displayName": "Meow Mentor — AI Coding Coach",
-  "description": "Tracks active coding time in VS Code and, optionally, syncs it into the same public profile as the Meow Mentor Safari extension.",
+  "displayName": "MeowMentor — AI Coding Coach",
+  "description": "Tracks active coding time in VS Code and, optionally, syncs it into the same public profile as the MeowMentor Safari extension.",
   "version": "0.1.0",
   "publisher": "meow-mentor",
   "private": true,
@@ -13,8 +13,8 @@
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
-      { "command": "meowmentor.setSyncCode", "title": "Meow Mentor: Set Sync Code" },
-      { "command": "meowmentor.clearSyncCode", "title": "Meow Mentor: Clear Sync Code" }
+      { "command": "meowmentor.setSyncCode", "title": "MeowMentor: Set Sync Code" },
+      { "command": "meowmentor.clearSyncCode", "title": "MeowMentor: Clear Sync Code" }
     ]
   },
   "scripts": {
