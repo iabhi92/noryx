@@ -41,7 +41,6 @@ class LeetCodeSubmissionWatcher implements Stoppable {
   private waiters: Array<(ev: SubmissionEvent | null) => void> = [];
   private observer: MutationObserver | null = null;
   private lastAction: 'run' | 'submit' | null = null;
-  private lastSeenText: string | null = null;
   private onClick = (event: MouseEvent): void => {
     const target = event.target as Element | null;
     if (target?.closest(SUBMIT_BUTTON_SELECTOR)) this.lastAction = 'submit';
@@ -64,9 +63,12 @@ class LeetCodeSubmissionWatcher implements Stoppable {
   private scan(): void {
     const el = document.querySelector(RESULT_SELECTOR);
     const text = el?.textContent?.trim() ?? null;
-    if (!text || text === this.lastSeenText) return;
-    this.lastSeenText = text;
-    if (this.lastAction !== 'submit' || !STATUS_STRINGS.includes(text as SubmissionStatus)) return;
+    // No text-based dedup here on purpose: lastAction already resets to null right after a
+    // reported result, which alone blocks any re-fire from the same submission settling across
+    // multiple mutations. A text-equality check on top of that doesn't add protection — it only
+    // breaks two consecutive Submit clicks that land the same verdict (e.g. Wrong Answer twice),
+    // which is exactly the pattern the AI coach's repeated-error trigger watches for.
+    if (!text || this.lastAction !== 'submit' || !STATUS_STRINGS.includes(text as SubmissionStatus)) return;
     this.lastAction = null;
 
     // Confirmed live: a sibling div reads "Runtime: 0 ms" next to the verdict; memory only

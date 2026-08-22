@@ -68,7 +68,14 @@ export class SubmissionWatcher implements Stoppable {
   private queue: SubmissionEvent[] = [];
   private waiters: Array<(ev: SubmissionEvent | null) => void> = [];
   private observer: MutationObserver | null = null;
-  private seen = new WeakSet<Element>();
+  // Keyed by element AND its text, not just the element: these sites often reuse the same result
+  // node across submissions rather than replacing it, so a bare per-element WeakSet would
+  // permanently ignore that node after its first verdict — silently dropping every later
+  // resubmission's result, including a genuine Accepted after an earlier Wrong Answer.
+  // ponytail: still misses a second submission that lands the exact same verdict text on the
+  // exact same node (no click signal to tell "still the old render" from "a new identical one",
+  // unlike leetcode.ts's watcher) — add per-platform submit-click tracking if that matters here.
+  private seen = new WeakMap<Element, string>();
 
   constructor(private matchStatus: StatusMatcher) {}
 
@@ -86,8 +93,8 @@ export class SubmissionWatcher implements Stoppable {
 
   private scan(): void {
     const hit = findLeafMatching((text) => this.matchStatus(text) !== null);
-    if (!hit || this.seen.has(hit.el)) return;
-    this.seen.add(hit.el);
+    if (!hit || this.seen.get(hit.el) === hit.text) return;
+    this.seen.set(hit.el, hit.text);
     const status = this.matchStatus(hit.text)!;
 
     const container = hit.el.closest('[class]')?.parentElement ?? hit.el.parentElement;
