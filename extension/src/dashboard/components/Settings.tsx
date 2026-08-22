@@ -45,6 +45,8 @@ export default function Settings() {
     setCleared(true);
     setSavedKey(null);
     setShareUrl(null);
+    setSyncCode(null);
+    setCaptureCode(false);
   }
 
   async function handleEnableProfile() {

@@ -47,7 +47,9 @@ export default function DailySummary() {
     setSummary({
       solvedToday,
       activeMsToday,
-      strongTopic: ranked[0]?.topic ?? null,
+      // Both require a second topic to compare against — with only one, its rate could be low
+      // and calling it "strong" purely for being the sole data point would be misleading.
+      strongTopic: ranked.length > 1 ? ranked[0].topic : null,
       weakTopic: ranked.length > 1 ? ranked[ranked.length - 1].topic : null,
     });
   }, []);
