@@ -42,6 +42,41 @@ async function setMap<T>(key: string, value: Record<string, T>): Promise<void> {
   await chrome.storage.local.set({ [key]: value });
 }
 
+const LEGACY_KEY_PAIRS: Array<[string, string]> = [
+  ['noryx:problems', KEYS.problems],
+  ['noryx:sessions', KEYS.sessions],
+  ['noryx:submissions', KEYS.submissions],
+  ['noryx:hints', KEYS.hints],
+  ['noryx:roadmap', KEYS.roadmap],
+  ['noryx:interviews', KEYS.interviews],
+  ['noryx:reviews', KEYS.reviews],
+  ['noryx:practiceProblem', KEYS.practiceProblem],
+  ['noryx:learnerProfile', KEYS.learnerProfile],
+  ['noryx:settings', 'meowmentor:settings'],
+];
+
+// Recovers data recorded before the Noryx -> Meow Mentor rename moved every storage key to a new
+// prefix, so it stops looking erased under the new key names. Idempotent: once a new key holds
+// data, its legacy pair is skipped, so this is cheap to call unconditionally on every startup.
+export async function migrateLegacyStorageKeys(): Promise<void> {
+  const oldKeys = LEGACY_KEY_PAIRS.map(([oldKey]) => oldKey);
+  const newKeys = LEGACY_KEY_PAIRS.map(([, newKey]) => newKey);
+  const [oldData, newData] = await Promise.all([
+    chrome.storage.local.get(oldKeys),
+    chrome.storage.local.get(newKeys),
+  ]);
+  const toSet: Record<string, unknown> = {};
+  for (const [oldKey, newKey] of LEGACY_KEY_PAIRS) {
+    if (oldData[oldKey] !== undefined && newData[newKey] === undefined) {
+      toSet[newKey] = oldData[oldKey];
+    }
+  }
+  if (Object.keys(toSet).length > 0) {
+    await chrome.storage.local.set(toSet);
+    console.info('[Meow Mentor] recovered local data from pre-rename storage keys:', Object.keys(toSet));
+  }
+}
+
 export async function upsertProblem(key: string, problem: Problem & ProblemMetadata): Promise<void> {
   const problems = await getMap<StoredProblem>(KEYS.problems);
   const existing = problems[key];

@@ -10,6 +10,7 @@ import {
   getLearnerProfile,
   saveLearnerProfile,
   getLearnerProfileContext,
+  migrateLegacyStorageKeys,
 } from '../lib/storage';
 import { problemKey, type HintLevel, type SubmissionEvent } from '../lib/types';
 import { getSettings } from '../lib/settings';
@@ -32,6 +33,8 @@ async function maybeSyncPublicProfile(): Promise<void> {
     console.warn('[Meow Mentor] public profile sync failed:', err);
   }
 }
+
+void migrateLegacyStorageKeys();
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage) => {
   void handleMessage(message);
