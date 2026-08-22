@@ -83,8 +83,19 @@ export interface HintContext {
 }
 
 export interface Hint {
-  level: HintLevel | 'solution';
+  level: HintLevel | 'solution' | 'review';
   text: string;
+}
+
+// Deliberately its own type, not a fit for the PRD's still-unimplemented SolutionContext stub
+// above (that's a different, broader shape TBD) — this is specifically what
+// GeminiProvider.reviewSolution needs: the Accepted code itself, since without it there's nothing
+// to judge the optimality of. Only ever called when settings.captureCode is on and code was
+// actually captured — see maybeReviewSolution in background/index.ts.
+export interface SolutionReviewContext {
+  problem: Problem & ProblemMetadata;
+  code: string;
+  language: string;
 }
 
 export interface InterviewContext {

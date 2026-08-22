@@ -7,6 +7,7 @@ import type {
   InterviewContext,
   GeneratedPracticeProblem,
   LearnerProfileContext,
+  SolutionReviewContext,
 } from './types';
 import { AIProviderError } from './types';
 import type { InterviewEvaluation, LearnerProfile, TopicSignal } from '../types';
@@ -236,6 +237,27 @@ function buildLearnerProfilePrompt(context: LearnerProfileContext): string {
   ].join('\n');
 }
 
+function buildSolutionReviewPrompt(context: SolutionReviewContext): string {
+  const { problem, code, language } = context;
+  return [
+    'You are Miko, reviewing a solution the user just got Accepted. Be honest about whether it',
+    'can be improved — never invent a "better" approach if what they wrote is already optimal or',
+    'close enough that further optimization would be over-engineering for this problem; say so',
+    'plainly instead of manufacturing a critique.',
+    '',
+    `Problem: ${problem.title}${problem.difficulty ? ` (${problem.difficulty})` : ''}`,
+    `Language: ${language}`,
+    `Accepted solution:\n\`\`\`${language}\n${code}\n\`\`\``,
+    '',
+    'Task: state the time and space complexity of this solution in one line. Then, only if a',
+    'genuinely better approach exists (better complexity, or the same complexity with a much',
+    'simpler implementation), briefly explain it and show the improved code in a markdown fence',
+    '(```<language> ... ```). If it is already optimal or near enough, say that clearly instead —',
+    'do not write an alternative just to have something to show.',
+    'Keep the explanation under 100 words, not counting any code shown.',
+  ].join('\n');
+}
+
 interface GeminiResponse {
   candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 }
@@ -381,5 +403,10 @@ export class GeminiProvider implements HintProvider {
       focusRecommendation: parsed.focusRecommendation,
       summary: parsed.summary,
     };
+  }
+
+  async reviewSolution(context: SolutionReviewContext): Promise<Hint> {
+    const text = await this.callGemini(buildSolutionReviewPrompt(context));
+    return { level: 'review', text };
   }
 }

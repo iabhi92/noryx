@@ -11,7 +11,7 @@ import {
   saveLearnerProfile,
   getLearnerProfileContext,
 } from '../lib/storage';
-import { problemKey, type HintLevel } from '../lib/types';
+import { problemKey, type HintLevel, type SubmissionEvent } from '../lib/types';
 import { getSettings } from '../lib/settings';
 import { shouldIntervene, MAX_AUTO_HINT_LEVEL } from '../lib/ai/intervention';
 import { GeminiProvider } from '../lib/ai/gemini-provider';
@@ -87,6 +87,7 @@ async function handleMessage(message: RuntimeMessage): Promise<void> {
       void maybeIntervene(message.problemKey);
       void maybeSyncPublicProfile();
       void maybeUpdateLearnerProfile();
+      void maybeReviewSolution(message.problemKey, message.submission);
       break;
   }
 }
@@ -140,6 +141,46 @@ async function maybeIntervene(key: string): Promise<void> {
     // Conservative-by-design: a failed hint (bad key, rate limit, network) should never crash
     // the service worker or block tracking. It just quietly doesn't nudge this time.
     console.warn('[Meow Mentor] hint generation failed:', err);
+  }
+}
+
+/** Automatic optimization feedback the moment a submission comes back Accepted — the post-solve
+ *  "is this actually a good solution" review, distinct from the in-flow progressive hints above.
+ *  Gated on settings.captureCode being on: a status of "Accepted" alone says nothing about
+ *  *how* the problem was solved, so without the actual code there's nothing to review. */
+async function maybeReviewSolution(key: string, submission: SubmissionEvent): Promise<void> {
+  if (submission.status !== 'Accepted') return;
+  if (!submission.code) return;
+
+  const settings = await getSettings();
+  if (!settings.geminiApiKey) return;
+
+  const problems = await getAllProblems();
+  const problem = problems[key];
+  if (!problem) return;
+
+  const session = await getOrCreateSession(key);
+  const provider = new GeminiProvider(settings.geminiApiKey);
+
+  try {
+    const hint = await provider.reviewSolution({ problem, code: submission.code, language: submission.language });
+    const now = Date.now();
+    await addHint({ sessionId: session.id, level: hint.level, text: hint.text, createdAt: now, auto: true });
+
+    unseenHints += 1;
+    updateBadge();
+
+    if (chrome.notifications) {
+      chrome.notifications.create(`meow-mentor-review-${session.id}-${now}`, {
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+        title: `Meow Mentor · ${problem.title}`,
+        message: hint.text,
+      });
+    }
+  } catch (err) {
+    // Same rule as maybeIntervene: never let a failed review call crash tracking.
+    console.warn('[Meow Mentor] solution review failed:', err);
   }
 }
 

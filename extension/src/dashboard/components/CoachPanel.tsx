@@ -63,6 +63,7 @@ const LEVEL_LABEL: Record<StoredHint['level'], string> = {
   3: 'Pattern',
   4: 'Concept',
   solution: 'Solution',
+  review: 'Review',
 };
 
 function TypingBubble() {

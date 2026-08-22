@@ -250,7 +250,11 @@ export async function getLearnerProfileContext(): Promise<LearnerProfileContext>
       const submissions = submissionsBySession[session.id] ?? [];
       const accepted = submissions.find((s) => s.status === 'Accepted');
       if (accepted) totalAccepted += 1;
-      const hints = hintsBySession[session.id] ?? [];
+      // 'review' hints are an automatic post-solve message, not a level the user climbed while
+      // stuck — excluding them keeps hintLevelsRequested meaningful for the hint-dependency trend.
+      const hintLevels = (hintsBySession[session.id] ?? [])
+        .map((h) => h.level)
+        .filter((level): level is HintLevel | 'solution' => level !== 'review');
       return {
         platform: problem.platform,
         title: problem.title,
@@ -259,7 +263,7 @@ export async function getLearnerProfileContext(): Promise<LearnerProfileContext>
         finalStatus: submissions[submissions.length - 1]?.status ?? 'In Progress',
         attempts: session.attempts,
         activeMs: session.activeMs,
-        hintLevelsRequested: hints.map((h) => h.level),
+        hintLevelsRequested: hintLevels,
         solvedAt: accepted?.timestamp,
       };
     })
