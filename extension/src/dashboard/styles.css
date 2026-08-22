@@ -17,17 +17,14 @@
   background-size: 20px 20px;
 }
 .glass-card {
-  /* Richer recipe from game_design/code.html's .glass-panel (tinted border, an inset glow
-     alongside the outer one) — but noticeably more transparent than that recipe's own 0.4 alpha:
-     with cards stacked densely on pages like Settings/Analytics, even a "reasonable" per-card
-     opacity compounds into the room background barely showing anywhere, which is exactly the
-     opposite of game_design/DESIGN.md's own point ("negative space is intentional... allow the
-     background gradients and room lighting to be visible"). Blur pulled back too so what shows
-     through reads as tinted glass, not a frosted-white smear. Kept at 20px rather than the
-     original's 64px: with glass-card on every session/problem row (Sessions.tsx,
-     ProblemsTable.tsx can render many at once), backdrop-filter cost multiplies by row count. */
-  background: rgba(15, 15, 15, 0.22);
-  backdrop-filter: blur(20px);
+  /* Progressively dropped further than game_design/code.html's own .glass-panel (0.4 alpha) after
+     two rounds of "still too opaque" feedback — cards stacked densely on pages like Settings/
+     Analytics were still blocking the room even at 0.22. Re-check against real content (not just
+     empty states) before dropping further: at some point card edges stop being legible against a
+     busy background at all. Blur kept modest (not the original's 64px): glass-card renders once
+     per row on Sessions/ProblemsTable, so backdrop-filter cost multiplies by row count. */
+  background: rgba(15, 15, 15, 0.12);
+  backdrop-filter: blur(14px);
   border: 1px solid rgba(219, 252, 255, 0.12);
   box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.05);
   transition: border-color 0.3s, box-shadow 0.3s;
