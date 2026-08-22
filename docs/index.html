@@ -154,7 +154,9 @@
 
   .mascot-frame {
     display: inline-block; padding: 32px 48px 20px; position: relative; overflow: visible;
+    max-width: 100%;
   }
+  .cat-stage { width: 640px; max-width: 100%; margin: 0 auto; overflow: visible; }
   .mascot-frame::after {
     content: '🐾'; position: absolute; bottom: -10px; right: 6px; font-size: 40px;
     opacity: 0.18; transform: rotate(12deg); filter: drop-shadow(0 0 10px rgba(0,240,255,0.3));
@@ -177,6 +179,8 @@
     .shots { grid-template-columns: 1fr; }
     .step { padding: 18px; gap: 16px; }
     .step .n { font-size: 24px; }
+    .mascot-frame { padding: 20px 20px 14px; }
+    .cat-stage { width: 100%; }
     nav .links { display: none; }
     .privacy-card { grid-template-columns: 1fr; text-align: center; }
   }
@@ -273,7 +277,7 @@
 <section id="mascot" style="padding: 24px 0 48px;">
   <div class="wrap" style="text-align: center;">
     <div class="glass-card mascot-frame">
-    <div class="cat-stage" style="--bg: transparent; --green: #a5ea9b; --pink: #ff61d8; --blue: #569cfa; --orange: #ffcc81; --cyan: #7ed1e2; max-width: 560px; margin: 0 auto; overflow: visible;">
+    <div class="cat-stage" style="--bg: transparent; --green: #a5ea9b; --pink: #ff61d8; --blue: #569cfa; --orange: #ffcc81; --cyan: #7ed1e2;">
       <svg viewBox="0 0 783.55 354.91" style="width: 100%; height: auto; overflow: visible;">
 <g id="bongo-cat">
   <g class="head">
